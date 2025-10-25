@@ -1,13 +1,37 @@
 # Kanban Task Management App
 
-A modern, full-stack task management application built with Next.js, TypeScript, Prisma, and PostgreSQL. Features a beautiful dark-themed Kanban interface with full CRUD operations, comprehensive testing, and professional-grade responsive design.
+A modern, full-stack task management application built with Next.js, TypeScript, Prisma, and PostgreSQL. Features a beautiful dark-themed Kanban interface with **custom columns**, full CRUD operations, comprehensive testing, and professional-grade responsive design.
 
 ![Kanban App](aragon-sample-ui.webp)
 
+## ⚡ Quick Start (5 minutes)
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Set up environment variables
+cp .env.example .env
+
+# 3. Start PostgreSQL with Docker
+npm run db:up
+
+# 4. Run migrations
+npm run migrate
+
+# 5. Seed with sample data
+npm run seed
+
+# 6. Start dev server
+npm run dev
+# Open http://localhost:3000
+```
+
 ## 🚀 Features
 
-- ✅ **Full CRUD Operations** - Create, read, update, and delete boards and tasks
-- 🎨 **Modern Dark UI** - Beautiful, pixel-perfect Kanban interface
+- ✅ **Full CRUD Operations** - Create, read, update, and delete boards, tasks, and columns
+- 🎨 **Custom Columns** - Create your own status columns beyond TODO/DOING/DONE with custom colors
+- 🌈 **Color Coding** - Visual status indicators with customizable column colors
 - 🔄 **Real-time Updates** - Instant UI updates after any operation
 - ✨ **Enhanced Form Validation** - Client-side and server-side validation with onBlur validation, character counters, and auto-focus
 - 🎯 **Type Safety** - Full TypeScript coverage throughout the application
@@ -16,6 +40,7 @@ A modern, full-stack task management application built with Next.js, TypeScript,
 - 📱 **Fully Responsive** - Mobile-first design with hamburger menu, works on all devices
 - 🎭 **Professional UX** - Hover states, loading spinners, empty states, status indicators
 - 🧪 **Test Coverage** - 9 passing tests covering API routes and service layer
+- 💾 **Persistent Selection** - Board selection saved in localStorage
 
 ## 📋 Tech Stack
 
@@ -67,11 +92,12 @@ aragon-todo-app/
 │   ├── Navigation.tsx            # Main navigation wrapper
 │   ├── BoardList.tsx             # Sidebar with board navigation
 │   ├── BoardView.tsx             # Kanban board layout container
-│   ├── KanbanColumn.tsx          # Column for TODO/DOING/DONE
+│   ├── KanbanColumn.tsx          # Dynamic status columns
 │   ├── TaskCard.tsx              # Individual task card
 │   ├── Modal.tsx                 # Reusable modal and form components
 │   ├── BoardFormModal.tsx        # Create/edit board modal
-│   └── TaskFormModal.tsx         # Create/edit task modal
+│   ├── TaskFormModal.tsx         # Create/edit task modal
+│   └── ColumnFormModal.tsx       # Create/edit column modal (NEW)
 ├── lib/
 │   ├── db.ts                     # Prisma client instance
 │   ├── types.ts                  # TypeScript type definitions
@@ -80,7 +106,8 @@ aragon-todo-app/
 │   ├── api-utils.ts              # API error handling utilities
 │   └── services/
 │       ├── board.service.ts      # Board database operations
-│       └── task.service.ts       # Task database operations
+│       ├── task.service.ts       # Task database operations
+│       └── column.service.ts     # Column database operations (NEW)
 ├── __tests__/                    # Test files
 │   ├── api/
 │   │   └── boards.test.ts        # API route tests
@@ -234,9 +261,14 @@ enum TaskStatus {
 **Key Features:**
 
 - UUID primary keys for scalability
-- Cascade delete (deleting a board deletes its tasks)
-- Database indexes on `boardId`, `status`, and `order` for query performance
+- Cascade delete (deleting a board deletes its columns and tasks)
+- **Custom columns** - Each board can have its own set of status columns with custom colors
+- **Flexible workflow** - Not limited to TODO/DOING/DONE
+- Database indexes on critical fields for query performance
+- Unique constraint prevents duplicate column names per board
 - Timestamps for audit trails
+
+**Note:** The schema has been updated to use `StatusColumn` model for flexible, custom columns. The old `TaskStatus` enum is deprecated.
 
 ## 🔌 API Endpoints
 
@@ -246,9 +278,18 @@ enum TaskStatus {
 | ------ | ----------------- | ------------------------------ |
 | GET    | `/api/boards`     | Get all boards                 |
 | POST   | `/api/boards`     | Create a new board             |
-| GET    | `/api/boards/:id` | Get a board with its tasks     |
+| GET    | `/api/boards/:id` | Get a board with columns/tasks |
 | PUT    | `/api/boards/:id` | Update a board                 |
 | DELETE | `/api/boards/:id` | Delete a board (and its tasks) |
+
+### Columns (NEW)
+
+| Method | Endpoint           | Description                     |
+| ------ | ------------------ | ------------------------------- |
+| GET    | `/api/columns`     | Get columns for a board         |
+| POST   | `/api/columns`     | Create a new column             |
+| PUT    | `/api/columns/:id` | Update a column (name/color)    |
+| DELETE | `/api/columns/:id` | Delete a column (and its tasks) |
 
 ### Tasks
 
@@ -447,8 +488,8 @@ If given more time, here are enhancements that could be added:
 - **Task Search**: Search and filter tasks across boards
 - **Due Dates**: Add deadlines and reminders to tasks
 - **Task Assignees**: Assign tasks to team members
-- **Custom Columns**: Allow users to create custom status columns beyond TODO/DOING/DONE
 - **Task Comments**: Add discussion threads to tasks
+- **Column Reordering**: Drag-and-drop to reorder columns
 
 ### Nice to Have
 

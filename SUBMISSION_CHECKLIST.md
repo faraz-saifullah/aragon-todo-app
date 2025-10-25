@@ -9,8 +9,9 @@
 - [x] PostgreSQL database with Docker
 - [x] Prisma ORM integration with performance indexes
 - [x] Dark-themed, fully responsive UI (mobile/tablet/desktop)
-- [x] No external UI component libraries (8 custom components)
+- [x] No external UI component libraries (9 custom components)
 - [x] Professional-grade code quality with tests
+- [x] **Custom columns feature** with color coding (NEW)
 
 ### Frontend Requirements
 
@@ -62,16 +63,17 @@
 - [x] PUT /api/tasks/:id - Update task
 - [x] DELETE /api/tasks/:id - Delete task
 
-### Components (8 total)
+### Components (9 total)
 
-- [x] Navigation - Main navigation wrapper (NEW)
+- [x] Navigation - Main navigation wrapper
 - [x] BoardList - Sidebar with board navigation
-- [x] BoardView - Kanban board layout container (NEW)
-- [x] KanbanColumn - Column for TODO/DOING/DONE
+- [x] BoardView - Kanban board layout container
+- [x] KanbanColumn - Dynamic status columns
 - [x] TaskCard - Individual task card
 - [x] Modal - Reusable modal wrapper
 - [x] BoardFormModal - Create/edit board form
 - [x] TaskFormModal - Create/edit task form
+- [x] ColumnFormModal - Create/edit column form (NEW)
 
 ### Code Quality
 
