@@ -6,16 +6,16 @@
   --color-surface-secondary: #20212c;
   --color-surface-accent: #635fc7;
   --color-surface-hover: #2c2d3a;
-  
-    /* Text colors */
+
+  /* Text colors */
   --color-text-primary: #ffffff;
   --color-text-secondary: #828fa3;
   --color-text-muted: #5a5e6a;
-/* Status colors */
+  /* Status colors */
   --color-status-todo: #49c4e5;
   --color-status-doing: #635fc7;
   --color-status-done: #67e2ae;
-/* Border colors */
+  /* Border colors */
   --color-border-primary: #3e3f4e;
 
   /* Scrollbar colors */

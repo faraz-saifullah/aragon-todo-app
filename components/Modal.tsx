@@ -14,14 +14,19 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
-      <div className="relative bg-surface-primary rounded-lg w-full max-w-md mx-4 p-6 shadow-2xl border border-surface-secondary">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-text-primary text-lg font-semibold">{title}</h2>
+      <div className="relative bg-surface-primary rounded-lg w-full max-w-md mx-3 sm:mx-4 p-4 sm:p-6 shadow-2xl border border-surface-secondary">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="text-text-primary text-base sm:text-lg font-semibold">{title}</h2>
           <button
             onClick={onClose}
             className="text-text-secondary hover:text-text-primary transition-colors"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-5 h-5 sm:w-6 sm:h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

@@ -27,6 +27,9 @@ export default function Home() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus>('TODO');
 
+  // Mobile menu state
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   // Auto-select first board if none selected
   useState(() => {
     if (!selectedBoardId && boards.length > 0) {
@@ -146,30 +149,70 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-surface-secondary">
-      {/* LEFT SECTION: Global App Navigation */}
-      <Navigation
-        boards={boards}
-        selectedBoardId={selectedBoardId}
-        onSelectBoard={setSelectedBoardId}
-        onAddBoard={handleAddBoard}
-      />
+      {/* LEFT SECTION: Global App Navigation - Hidden on mobile, overlay when open */}
+      <div
+        className={`
+        fixed lg:static inset-0 z-40 lg:z-auto
+        ${isMobileMenuOpen ? 'block' : 'hidden lg:block'}
+      `}
+      >
+        <Navigation
+          boards={boards}
+          selectedBoardId={selectedBoardId}
+          onSelectBoard={(id) => {
+            setSelectedBoardId(id);
+            setIsMobileMenuOpen(false); // Close menu after selection on mobile
+          }}
+          onAddBoard={() => {
+            handleAddBoard();
+            setIsMobileMenuOpen(false); // Close menu after action on mobile
+          }}
+          onClose={() => setIsMobileMenuOpen(false)} // Close button handler
+        />
+        {/* Mobile backdrop */}
+        {isMobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 lg:hidden -z-10"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-label="Close menu"
+          />
+        )}
+      </div>
 
       {/* RIGHT SECTION: Main App Content */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Content Header - Board-specific actions */}
         <header
           role="banner"
-          className="bg-surface-primary border-b border-border-primary px-6 py-5 md:px-8 md:py-6 flex items-center justify-between h-[80px] md:h-[96px] flex-shrink-0"
+          className="bg-surface-primary border-b border-border-primary px-4 py-4 md:px-6 md:py-5 lg:px-8 lg:py-6 flex items-center justify-between h-[64px] md:h-[80px] lg:h-[96px] flex-shrink-0"
         >
-          <h1 className="text-text-primary text-lg md:text-xl lg:text-2xl font-bold truncate">
-            {board?.title || 'Select a board'}
-          </h1>
+          <div className="flex items-center gap-3 md:gap-4 min-w-0">
+            {/* Hamburger menu for mobile */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden text-text-primary flex-shrink-0"
+              aria-label="Open menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+            <h1 className="text-text-primary text-base md:text-lg lg:text-xl font-bold truncate">
+              {board?.title || 'Select a board'}
+            </h1>
+          </div>
           <button
             onClick={() => handleAddTask('TODO')}
-            className="bg-surface-accent hover:bg-surface-accent/90 text-text-primary px-4 py-2 md:px-6 md:py-3 rounded-full font-medium transition-colors text-sm md:text-base flex-shrink-0"
+            className="bg-surface-accent hover:bg-surface-accent/90 text-text-primary px-3 py-2 md:px-4 md:py-2 lg:px-6 lg:py-3 rounded-full font-medium transition-colors text-xs md:text-sm lg:text-base flex-shrink-0"
             aria-label="Add new task"
           >
-            + Add New Task
+            <span className="hidden sm:inline">+ Add New Task</span>
+            <span className="sm:hidden">+ Task</span>
           </button>
         </header>
 

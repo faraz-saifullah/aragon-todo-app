@@ -27,24 +27,24 @@ export default function KanbanColumn({
   onAddTask,
 }: KanbanColumnProps) {
   return (
-    <div className="flex flex-col min-w-[280px] w-[280px]">
+    <div className="flex flex-col min-w-[240px] w-[240px] md:min-w-[280px] md:w-[280px]">
       {/* Fixed Column Header - doesn't scroll */}
-      <div className="flex items-center gap-3 mb-6 flex-shrink-0">
-        <div className={`w-[15px] h-[15px] rounded-full ${color}`} />
-        <h2 className="text-text-secondary text-xs font-bold uppercase tracking-[2.4px]">
+      <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 flex-shrink-0">
+        <div className={`w-[12px] h-[12px] md:w-[15px] md:h-[15px] rounded-full ${color}`} />
+        <h2 className="text-text-secondary text-[10px] md:text-xs font-bold uppercase tracking-[2px] md:tracking-[2.4px]">
           {title} ({count})
         </h2>
       </div>
 
       {/* Column Content - scrolls with all other columns */}
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-4 md:gap-5">
         {tasks.map((task) => (
           <TaskCard key={task.id} task={task} onEdit={onEditTask} onDelete={onDeleteTask} />
         ))}
 
         <button
           onClick={() => onAddTask(status)}
-          className="bg-transparent rounded-lg py-[14px] text-text-secondary hover:text-text-primary transition-colors border-none text-[15px] font-bold text-left"
+          className="bg-transparent rounded-lg py-[12px] md:py-[14px] text-text-secondary hover:text-text-primary transition-colors border-none text-[14px] md:text-[15px] font-bold text-left"
         >
           + New
         </button>

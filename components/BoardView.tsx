@@ -26,8 +26,8 @@ export default function BoardView({
 }: BoardViewProps) {
   return (
     <div className="h-full overflow-x-auto overflow-y-auto">
-      <div className="px-4 py-6 md:px-6 md:py-6 min-w-min h-full">
-        <div className="flex gap-6 h-full items-start">
+      <div className="px-3 py-4 md:px-4 md:py-6 lg:px-6 lg:py-6 min-w-min h-full">
+        <div className="flex gap-4 md:gap-6 h-full items-start">
           <KanbanColumn
             title="Todo"
             status="TODO"
