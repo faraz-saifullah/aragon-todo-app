@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Navigation from '@/components/Navigation';
-import KanbanColumn from '@/components/KanbanColumn';
+import BoardView from '@/components/BoardView';
 import BoardFormModal from '@/components/BoardFormModal';
 import TaskFormModal from '@/components/TaskFormModal';
 import { useBoards, useBoard } from '@/lib/hooks';
@@ -174,51 +174,20 @@ export default function Home() {
         </header>
 
         {/* Content Body - Kanban Board Area */}
-        <main
-          role="main"
-          className="flex-1 overflow-x-auto overflow-y-hidden"
-          aria-label="Kanban board"
-        >
-          <div className="h-full px-4 py-6 md:px-6 md:py-6">
-            {board ? (
-              <div className="flex gap-6 h-full">
-                <KanbanColumn
-                  title="Todo"
-                  status="TODO"
-                  tasks={tasksByStatus.TODO}
-                  count={tasksByStatus.TODO.length}
-                  color="bg-status-todo"
-                  onEditTask={handleEditTask}
-                  onDeleteTask={handleDeleteTask}
-                  onAddTask={handleAddTask}
-                />
-                <KanbanColumn
-                  title="Doing"
-                  status="DOING"
-                  tasks={tasksByStatus.DOING}
-                  count={tasksByStatus.DOING.length}
-                  color="bg-status-doing"
-                  onEditTask={handleEditTask}
-                  onDeleteTask={handleDeleteTask}
-                  onAddTask={handleAddTask}
-                />
-                <KanbanColumn
-                  title="Done"
-                  status="DONE"
-                  tasks={tasksByStatus.DONE}
-                  count={tasksByStatus.DONE.length}
-                  color="bg-status-done"
-                  onEditTask={handleEditTask}
-                  onDeleteTask={handleDeleteTask}
-                  onAddTask={handleAddTask}
-                />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <p className="text-text-secondary text-lg">Select a board to view tasks</p>
-              </div>
-            )}
-          </div>
+        <main role="main" className="flex-1 overflow-hidden" aria-label="Kanban board">
+          {board ? (
+            <BoardView
+              boardTitle={board.title}
+              tasksByStatus={tasksByStatus}
+              onEditTask={handleEditTask}
+              onDeleteTask={handleDeleteTask}
+              onAddTask={handleAddTask}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-text-secondary text-lg">Select a board to view tasks</p>
+            </div>
+          )}
         </main>
       </div>
 

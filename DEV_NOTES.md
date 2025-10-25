@@ -72,6 +72,7 @@ Default credentials (from `.env`):
    - Based on the Platform Launch example from the design
 
 6. **Start development server**
+
    ```bash
    npm run dev
    ```

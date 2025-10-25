@@ -14,6 +14,7 @@ interface KanbanColumnProps {
 
 /**
  * KanbanColumn component - displays a column of tasks (TODO, DOING, DONE)
+ * JIRA-style: Fixed header, content scrolls with all other columns together
  */
 export default function KanbanColumn({
   title,
@@ -26,15 +27,17 @@ export default function KanbanColumn({
   onAddTask,
 }: KanbanColumnProps) {
   return (
-    <div className="flex flex-col min-w-[280px] flex-1">
-      <div className="flex items-center gap-3 mb-6">
+    <div className="flex flex-col min-w-[280px] w-[280px]">
+      {/* Fixed Column Header - doesn't scroll */}
+      <div className="flex items-center gap-3 mb-6 flex-shrink-0">
         <div className={`w-[15px] h-[15px] rounded-full ${color}`} />
         <h2 className="text-text-secondary text-xs font-bold uppercase tracking-[2.4px]">
           {title} ({count})
         </h2>
       </div>
 
-      <div className="flex flex-col gap-5 flex-1">
+      {/* Column Content - scrolls with all other columns */}
+      <div className="flex flex-col gap-5">
         {tasks.map((task) => (
           <TaskCard key={task.id} task={task} onEdit={onEditTask} onDelete={onDeleteTask} />
         ))}

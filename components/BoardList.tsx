@@ -45,10 +45,11 @@ export default function BoardList({
             <button
               key={board.id}
               onClick={() => onSelectBoard(board.id)}
-              className={`w-full text-left pl-8 pr-6 py-[15px] mr-6 rounded-r-full transition-all flex items-center gap-3 group ${selectedBoardId === board.id
+              className={`w-full text-left pl-8 pr-6 py-[15px] mr-6 rounded-r-full transition-all flex items-center gap-3 group ${
+                selectedBoardId === board.id
                   ? 'bg-surface-accent text-text-primary'
                   : 'text-text-secondary hover:bg-text-primary/10 hover:text-surface-accent'
-                }`}
+              }`}
             >
               <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M0 2.5A.5.5 0 0 1 .5 2h3a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-11zm5 0A.5.5 0 0 1 5.5 2h3a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-7zm5 0A.5.5 0 0 1 10.5 2h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-3z" />
