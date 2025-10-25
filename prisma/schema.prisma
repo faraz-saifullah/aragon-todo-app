@@ -11,29 +11,48 @@ datasource db {
 }
 
 model Board {
-  id          String   @id @default(uuid())
+  id          String         @id @default(uuid())
   title       String
   description String?
   tasks       Task[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  columns     StatusColumn[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model StatusColumn {
+  id        String   @id @default(uuid())
+  boardId   String
+  name      String // "TODO", "In Review", "Blocked", etc.
+  order     Int // Display order
+  color     String? // Hex color like "#FF6B6B"
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([boardId, order])
+  @@unique([boardId, name]) // Prevent duplicate column names per board
 }
 
 model Task {
-  id          String     @id @default(uuid())
+  id          String       @id @default(uuid())
   title       String
   description String?
-  status      TaskStatus @default(TODO)
-  order       Int        @default(0)
+  statusId    String
+  status      StatusColumn @relation(fields: [statusId], references: [id], onDelete: Cascade)
+  order       Int          @default(0)
   boardId     String
-  board       Board      @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  board       Board        @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   @@index([boardId])
-  @@index([boardId, status, order])
+  @@index([statusId, order])
+  @@index([boardId, statusId, order])
 }
 
+// Keep old enum for reference, but it's no longer used
 enum TaskStatus {
   TODO
   DOING

@@ -107,7 +107,7 @@ describe('Board Service', () => {
   });
 
   describe('getBoardById', () => {
-    it('should return a board with its tasks', async () => {
+    it('should return a board with its columns and tasks', async () => {
       // Arrange
       const mockBoard = {
         id: '123',
@@ -115,16 +115,27 @@ describe('Board Service', () => {
         description: 'Test Description',
         createdAt: new Date(),
         updatedAt: new Date(),
-        tasks: [
+        columns: [
           {
-            id: 'task1',
-            title: 'Task 1',
-            description: null,
-            status: 'TODO' as const,
+            id: 'col1',
+            name: 'TODO',
             order: 0,
+            color: '#64748b',
             boardId: '123',
             createdAt: new Date(),
             updatedAt: new Date(),
+            tasks: [
+              {
+                id: 'task1',
+                title: 'Task 1',
+                description: null,
+                statusId: 'col1',
+                order: 0,
+                boardId: '123',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              },
+            ],
           },
         ],
       };
@@ -139,8 +150,13 @@ describe('Board Service', () => {
       expect(prisma.board.findUnique).toHaveBeenCalledWith({
         where: { id: '123' },
         include: {
-          tasks: {
-            orderBy: [{ status: 'asc' }, { order: 'asc' }],
+          columns: {
+            orderBy: { order: 'asc' },
+            include: {
+              tasks: {
+                orderBy: { order: 'asc' },
+              },
+            },
           },
         },
       });

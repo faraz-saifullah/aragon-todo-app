@@ -47,7 +47,7 @@ export const createTaskSchema = z.object({
     .string()
     .transform((val) => val.trim())
     .optional(),
-  status: z.enum(['TODO', 'DOING', 'DONE']).default('TODO'),
+  statusId: z.string().uuid('Invalid status column ID'),
   order: z.number().int().nonnegative().optional(),
   boardId: z.string().uuid('Invalid board ID'),
 });
@@ -64,9 +64,43 @@ export const updateTaskSchema = z.object({
     .transform((val) => val.trim())
     .nullable()
     .optional(),
-  status: z.enum(['TODO', 'DOING', 'DONE']).optional(),
+  statusId: z.string().uuid('Invalid status column ID').optional(),
   order: z.number().int().nonnegative().optional(),
   boardId: z.string().uuid('Invalid board ID').optional(),
+});
+
+// StatusColumn validation schemas
+export const createColumnSchema = z.object({
+  boardId: z.string().uuid('Invalid board ID'),
+  name: z
+    .string()
+    .min(1, 'Column name is required')
+    .max(50, 'Column name is too long')
+    .transform((val) => val.trim()),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color')
+    .optional(),
+  order: z.number().int().nonnegative().optional(),
+});
+
+export const updateColumnSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Column name is required')
+    .max(50, 'Column name is too long')
+    .transform((val) => val.trim())
+    .optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color')
+    .optional(),
+});
+
+export const reorderColumnsSchema = z.object({
+  columnIds: z
+    .array(z.string().uuid('Invalid column ID'))
+    .min(1, 'At least one column ID is required'),
 });
 
 // Types exported from schemas
@@ -74,3 +108,6 @@ export type CreateBoardInput = z.infer<typeof createBoardSchema>;
 export type UpdateBoardInput = z.infer<typeof updateBoardSchema>;
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
+export type CreateColumnInput = z.infer<typeof createColumnSchema>;
+export type UpdateColumnInput = z.infer<typeof updateColumnSchema>;
+export type ReorderColumnsInput = z.infer<typeof reorderColumnsSchema>;

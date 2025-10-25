@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Modal, { Input, TextArea, Select, Button } from './Modal';
-import type { Task, CreateTaskForm, UpdateTaskForm, TaskStatus } from '@/lib/types';
+import type { Task, CreateTaskForm, UpdateTaskForm, StatusColumn } from '@/lib/types';
 
 interface TaskFormModalProps {
   isOpen: boolean;
@@ -8,14 +8,9 @@ interface TaskFormModalProps {
   onSubmit: (data: CreateTaskForm | UpdateTaskForm) => Promise<void>;
   task?: Task | null;
   boardId: string;
-  defaultStatus?: TaskStatus;
+  columns: StatusColumn[];
+  defaultColumnId?: string;
 }
-
-const STATUS_OPTIONS = [
-  { value: 'TODO', label: 'Todo' },
-  { value: 'DOING', label: 'Doing' },
-  { value: 'DONE', label: 'Done' },
-];
 
 /**
  * TaskFormModal - modal for creating/editing tasks
@@ -26,26 +21,33 @@ export default function TaskFormModal({
   onSubmit,
   task,
   boardId,
-  defaultStatus = 'TODO',
+  columns,
+  defaultColumnId,
 }: TaskFormModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<TaskStatus>(defaultStatus);
+  const [statusId, setStatusId] = useState<string>(defaultColumnId || columns[0]?.id || '');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+
+  // Build column options from columns prop
+  const columnOptions = columns.map((col) => ({
+    value: col.id,
+    label: col.name,
+  }));
 
   useEffect(() => {
     if (task) {
       setTitle(task.title);
       setDescription(task.description || '');
-      setStatus(task.status);
+      setStatusId(task.statusId);
     } else {
       setTitle('');
       setDescription('');
-      setStatus(defaultStatus);
+      setStatusId(defaultColumnId || columns[0]?.id || '');
     }
     setErrors({});
-  }, [task, defaultStatus, isOpen]);
+  }, [task, defaultColumnId, columns, isOpen]);
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -78,12 +80,12 @@ export default function TaskFormModal({
         ? {
             title: title.trim(),
             description: description.trim() || undefined,
-            status,
+            statusId,
           }
         : {
             title: title.trim(),
             description: description.trim() || undefined,
-            status,
+            statusId,
             boardId,
           };
       await onSubmit(data);
@@ -122,10 +124,10 @@ export default function TaskFormModal({
         />
 
         <Select
-          label="Status"
-          value={status}
-          onChange={(value) => setStatus(value as TaskStatus)}
-          options={STATUS_OPTIONS}
+          label="Column"
+          value={statusId}
+          onChange={(value) => setStatusId(value)}
+          options={columnOptions}
         />
 
         {errors.submit && <p className="text-red-400 text-sm mb-4">{errors.submit}</p>}

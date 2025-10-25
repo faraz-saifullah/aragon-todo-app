@@ -20,8 +20,13 @@ export async function getBoardById(id: string) {
   return prisma.board.findUnique({
     where: { id },
     include: {
-      tasks: {
-        orderBy: [{ status: 'asc' }, { order: 'asc' }],
+      columns: {
+        orderBy: { order: 'asc' },
+        include: {
+          tasks: {
+            orderBy: { order: 'asc' },
+          },
+        },
       },
     },
   });
@@ -29,7 +34,10 @@ export async function getBoardById(id: string) {
 
 export async function createBoard(data: CreateBoardInput) {
   return prisma.board.create({
-    data,
+    data: {
+      title: data.title,
+      description: data.description,
+    },
     include: {
       _count: {
         select: { tasks: true },

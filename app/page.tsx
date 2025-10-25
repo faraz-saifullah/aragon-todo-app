@@ -5,14 +5,16 @@ import Navigation from '@/components/Navigation';
 import BoardView from '@/components/BoardView';
 import BoardFormModal from '@/components/BoardFormModal';
 import TaskFormModal from '@/components/TaskFormModal';
+import ColumnFormModal from '@/components/ColumnFormModal';
 import { useBoards, useBoard } from '@/lib/hooks';
 import type {
   Task,
-  TaskStatus,
   CreateBoardForm,
   UpdateBoardForm,
   CreateTaskForm,
   UpdateTaskForm,
+  CreateColumnForm,
+  UpdateColumnForm,
 } from '@/lib/types';
 
 export default function Home() {
@@ -23,29 +25,35 @@ export default function Home() {
   // Modal states
   const [boardModalOpen, setBoardModalOpen] = useState(false);
   const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [columnModalOpen, setColumnModalOpen] = useState(false);
   const [editingBoard, setEditingBoard] = useState<typeof board | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus>('TODO');
+  const [newTaskColumnId, setNewTaskColumnId] = useState<string | null>(null);
 
   // Mobile menu state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Auto-select first board if none selected
+  // Load saved board selection from localStorage on mount
   useEffect(() => {
-    if (!selectedBoardId && boards.length > 0) {
+    const savedBoardId = localStorage.getItem('selectedBoardId');
+    if (savedBoardId && boards.some((b) => b.id === savedBoardId)) {
+      setSelectedBoardId(savedBoardId);
+    } else if (!selectedBoardId && boards.length > 0) {
       setSelectedBoardId(boards[0].id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boards]);
 
-  // Group tasks by status
-  const tasksByStatus = useMemo(() => {
-    const tasks = board?.tasks || [];
-    return {
-      TODO: tasks.filter((t) => t.status === 'TODO'),
-      DOING: tasks.filter((t) => t.status === 'DOING'),
-      DONE: tasks.filter((t) => t.status === 'DONE'),
-    };
+  // Save board selection to localStorage whenever it changes
+  useEffect(() => {
+    if (selectedBoardId) {
+      localStorage.setItem('selectedBoardId', selectedBoardId);
+    }
+  }, [selectedBoardId]);
+
+  // Get columns with their tasks (columns is already ordered by order from API)
+  const columns = useMemo(() => {
+    return board?.columns || [];
   }, [board]);
 
   // Board handlers
@@ -64,9 +72,9 @@ export default function Home() {
   };
 
   // Task handlers
-  const handleAddTask = (status: TaskStatus) => {
+  const handleAddTask = (columnId: string) => {
     setEditingTask(null);
-    setNewTaskStatus(status);
+    setNewTaskColumnId(columnId);
     setTaskModalOpen(true);
   };
 
@@ -113,6 +121,26 @@ export default function Home() {
     if (!response.ok) {
       const result = await response.json();
       throw new Error(result.error || 'Failed to delete task');
+    }
+
+    await refetchBoard();
+  };
+
+  // Column handlers
+  const handleAddColumn = () => {
+    setColumnModalOpen(true);
+  };
+
+  const handleColumnSubmit = async (data: CreateColumnForm | UpdateColumnForm) => {
+    const response = await fetch('/api/columns', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const result = await response.json();
+      throw new Error(result.error || 'Failed to create column');
     }
 
     await refetchBoard();
@@ -208,9 +236,15 @@ export default function Home() {
             </h1>
           </div>
           <button
-            onClick={() => handleAddTask('TODO')}
+            onClick={() => {
+              const firstColumn = columns[0];
+              if (firstColumn) {
+                handleAddTask(firstColumn.id);
+              }
+            }}
             className="bg-surface-accent hover:bg-surface-accent/90 text-text-primary px-3 py-2 md:px-4 md:py-2 lg:px-6 lg:py-3 rounded-full font-medium transition-colors text-xs md:text-sm lg:text-base flex-shrink-0"
             aria-label="Add new task"
+            disabled={columns.length === 0}
           >
             <span className="hidden sm:inline">+ Add New Task</span>
             <span className="sm:hidden">+ Task</span>
@@ -221,11 +255,11 @@ export default function Home() {
         <main role="main" className="flex-1 overflow-hidden" aria-label="Kanban board">
           {board ? (
             <BoardView
-              boardTitle={board.title}
-              tasksByStatus={tasksByStatus}
+              columns={columns}
               onEditTask={handleEditTask}
               onDeleteTask={handleDeleteTask}
               onAddTask={handleAddTask}
+              onAddColumn={handleAddColumn}
             />
           ) : (
             <div className="flex items-center justify-center h-full">
@@ -249,7 +283,15 @@ export default function Home() {
         onSubmit={handleTaskSubmit}
         task={editingTask}
         boardId={selectedBoardId || ''}
-        defaultStatus={newTaskStatus}
+        columns={columns}
+        defaultColumnId={newTaskColumnId || undefined}
+      />
+
+      <ColumnFormModal
+        isOpen={columnModalOpen}
+        onClose={() => setColumnModalOpen(false)}
+        onSubmit={handleColumnSubmit}
+        boardId={selectedBoardId || ''}
       />
     </div>
   );
