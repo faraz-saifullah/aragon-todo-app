@@ -26,7 +26,7 @@ export function handleApiError(error: unknown): NextResponse<ApiError> {
     return NextResponse.json(
       {
         error: 'Validation error',
-        details: error.errors,
+        details: error.issues,
       },
       { status: 400 }
     );

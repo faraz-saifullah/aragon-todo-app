@@ -13,9 +13,7 @@ interface TaskCardProps {
 export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm(`Are you sure you want to delete "${task.title}"?`)) {
-      onDelete(task.id);
-    }
+    onDelete(task.id);
   };
 
   return (

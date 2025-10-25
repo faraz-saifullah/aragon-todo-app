@@ -31,8 +31,7 @@ export interface Board {
   id: string;
   title: string;
   description: string | null;
-  columns?: StatusColumn[]; // New: columns with nested tasks
-  tasks?: Task[]; // Legacy: flat tasks array (deprecated)
+  columns?: StatusColumn[];
   _count?: {
     tasks: number;
   };
@@ -72,5 +71,4 @@ export interface CreateColumnForm {
 export interface UpdateColumnForm {
   name?: string;
   color?: string;
-  order?: number;
 }

@@ -83,7 +83,7 @@ export async function deleteColumn(id: string, moveToColumnId: string) {
   });
 
   if (!targetColumn) {
-    throw new Error('Target column not found');
+    throw new Error(`Target column ${moveToColumnId} not found`);
   }
 
   // Get the column to be deleted and verify it exists
@@ -93,7 +93,7 @@ export async function deleteColumn(id: string, moveToColumnId: string) {
   });
 
   if (!columnToDelete) {
-    throw new Error('Column not found');
+    throw new Error(`Column ${id} not found`);
   }
 
   // Verify both columns belong to the same board
@@ -113,24 +113,31 @@ export async function deleteColumn(id: string, moveToColumnId: string) {
 
     const startOrder = (maxOrder?.order ?? -1) + 1;
 
-    // Get all tasks from the column being deleted
+    // Get all tasks from the column being deleted (ordered)
     const tasksToMove = await tx.task.findMany({
       where: { statusId: id },
       orderBy: { order: 'asc' },
+      select: { id: true },
     });
 
-    // Update each task to point to the new column with new order
-    for (let i = 0; i < tasksToMove.length; i++) {
-      await tx.task.update({
-        where: { id: tasksToMove[i].id },
-        data: {
-          statusId: moveToColumnId,
-          order: startOrder + i,
-        },
-      });
-    }
+    // Bulk update all tasks to new column
+    await tx.task.updateMany({
+      where: { statusId: id },
+      data: { statusId: moveToColumnId },
+    });
 
-    // Now delete the column (should have no tasks left)
+    // Update orders individually (required since order depends on original position)
+    // Using Promise.all for parallel execution
+    await Promise.all(
+      tasksToMove.map((task, index) =>
+        tx.task.update({
+          where: { id: task.id },
+          data: { order: startOrder + index },
+        })
+      )
+    );
+
+    // Now delete the column (should have no tasks left due to updateMany above)
     await tx.statusColumn.delete({
       where: { id },
     });

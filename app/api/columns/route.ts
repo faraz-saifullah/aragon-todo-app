@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getColumnsByBoardId, createColumn, reorderColumns } from '@/lib/services/column.service';
 import { createColumnSchema, reorderColumnsSchema } from '@/lib/validation';
 import { handleApiError, successResponse } from '@/lib/api-utils';
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const boardId = searchParams.get('boardId');
 
     if (!boardId) {
-      return successResponse({ error: 'boardId query parameter is required' }, 400);
+      return NextResponse.json({ error: 'boardId query parameter is required' }, { status: 400 });
     }
 
     const columns = await getColumnsByBoardId(boardId);
@@ -46,7 +46,7 @@ export async function PATCH(request: NextRequest) {
     const { boardId, columnIds } = body;
 
     if (!boardId) {
-      return successResponse({ error: 'boardId is required' }, 400);
+      return NextResponse.json({ error: 'boardId is required' }, { status: 400 });
     }
 
     const validatedData = reorderColumnsSchema.parse({ columnIds });

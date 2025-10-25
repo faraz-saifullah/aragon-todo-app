@@ -6,7 +6,10 @@ import BoardView from '@/components/BoardView';
 import BoardFormModal from '@/components/BoardFormModal';
 import TaskFormModal from '@/components/TaskFormModal';
 import ColumnFormModal from '@/components/ColumnFormModal';
+import ConfirmationModal from '@/components/ConfirmationModal';
 import { useBoards, useBoard } from '@/lib/hooks';
+import { useToast } from '@/contexts/ToastContext';
+import { getFromStorage, setInStorage } from '@/lib/hooks/usePersistedState';
 import type {
   Task,
   CreateBoardForm,
@@ -18,8 +21,27 @@ import type {
 } from '@/lib/types';
 
 export default function Home() {
-  const { boards, loading: boardsLoading, createBoard, updateBoard, deleteBoard } = useBoards();
-  const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
+  const { boards, loading: boardsLoading, createBoard, updateBoard } = useBoards();
+  const toast = useToast();
+
+  // Internal state for user's explicit selection (can be invalid)
+  const [userSelectedBoardId, setUserSelectedBoardId] = useState<string | null>(() => {
+    return getFromStorage<string | null>('selectedBoardId', null);
+  });
+
+  // Compute the actual valid board ID to use
+  const selectedBoardId = useMemo(() => {
+    if (boards.length === 0) return null;
+
+    // If user has a selection and it's still valid, use it
+    if (userSelectedBoardId && boards.some((b) => b.id === userSelectedBoardId)) {
+      return userSelectedBoardId;
+    }
+
+    // Otherwise, use first board
+    return boards[0].id;
+  }, [boards, userSelectedBoardId]);
+
   const { board, refetch: refetchBoard } = useBoard(selectedBoardId);
 
   // Modal states
@@ -30,24 +52,17 @@ export default function Home() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [newTaskColumnId, setNewTaskColumnId] = useState<string | null>(null);
 
+  // Confirmation modal state
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+
   // Mobile menu state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Load saved board selection from localStorage on mount
-  useEffect(() => {
-    const savedBoardId = localStorage.getItem('selectedBoardId');
-    if (savedBoardId && boards.some((b) => b.id === savedBoardId)) {
-      setSelectedBoardId(savedBoardId);
-    } else if (!selectedBoardId && boards.length > 0) {
-      setSelectedBoardId(boards[0].id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [boards]);
 
   // Save board selection to localStorage whenever it changes
   useEffect(() => {
     if (selectedBoardId) {
-      localStorage.setItem('selectedBoardId', selectedBoardId);
+      setInStorage('selectedBoardId', selectedBoardId);
     }
   }, [selectedBoardId]);
 
@@ -63,11 +78,17 @@ export default function Home() {
   };
 
   const handleBoardSubmit = async (data: CreateBoardForm | UpdateBoardForm) => {
-    if (editingBoard) {
-      await updateBoard(editingBoard.id, data);
-    } else {
-      const newBoard = await createBoard(data as CreateBoardForm);
-      setSelectedBoardId(newBoard.id);
+    try {
+      if (editingBoard) {
+        await updateBoard(editingBoard.id, data);
+        toast.success('Board updated successfully');
+      } else {
+        const newBoard = await createBoard(data as CreateBoardForm);
+        setUserSelectedBoardId(newBoard.id);
+        toast.success('Board created successfully');
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to save board');
     }
   };
 
@@ -84,46 +105,66 @@ export default function Home() {
   };
 
   const handleTaskSubmit = async (data: CreateTaskForm | UpdateTaskForm) => {
-    if (editingTask) {
-      // Update existing task
-      const response = await fetch(`/api/tasks/${editingTask.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+    try {
+      if (editingTask) {
+        // Update existing task
+        const response = await fetch(`/api/tasks/${editingTask.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
 
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error || 'Failed to update task');
-      }
-    } else {
-      // Create new task
-      const response = await fetch('/api/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+        if (!response.ok) {
+          const result = await response.json();
+          throw new Error(result.error || 'Failed to update task');
+        }
+        toast.success('Task updated successfully');
+      } else {
+        // Create new task
+        const response = await fetch('/api/tasks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
 
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error || 'Failed to create task');
+        if (!response.ok) {
+          const result = await response.json();
+          throw new Error(result.error || 'Failed to create task');
+        }
+        toast.success('Task created successfully');
       }
+
+      await refetchBoard();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to save task');
     }
-
-    await refetchBoard();
   };
 
-  const handleDeleteTask = async (taskId: string) => {
-    const response = await fetch(`/api/tasks/${taskId}`, {
-      method: 'DELETE',
-    });
+  const handleRequestDeleteTask = (taskId: string) => {
+    setTaskToDelete(taskId);
+    setConfirmationOpen(true);
+  };
 
-    if (!response.ok) {
-      const result = await response.json();
-      throw new Error(result.error || 'Failed to delete task');
+  const handleConfirmDeleteTask = async () => {
+    if (!taskToDelete) return;
+
+    try {
+      const response = await fetch(`/api/tasks/${taskToDelete}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || 'Failed to delete task');
+      }
+
+      toast.success('Task deleted successfully');
+      await refetchBoard();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete task');
+    } finally {
+      setTaskToDelete(null);
     }
-
-    await refetchBoard();
   };
 
   // Column handlers
@@ -132,18 +173,23 @@ export default function Home() {
   };
 
   const handleColumnSubmit = async (data: CreateColumnForm | UpdateColumnForm) => {
-    const response = await fetch('/api/columns', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+    try {
+      const response = await fetch('/api/columns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
 
-    if (!response.ok) {
-      const result = await response.json();
-      throw new Error(result.error || 'Failed to create column');
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || 'Failed to create column');
+      }
+
+      toast.success('Column created successfully');
+      await refetchBoard();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to create column');
     }
-
-    await refetchBoard();
   };
 
   if (boardsLoading) {
@@ -189,7 +235,7 @@ export default function Home() {
           boards={boards}
           selectedBoardId={selectedBoardId}
           onSelectBoard={(id) => {
-            setSelectedBoardId(id);
+            setUserSelectedBoardId(id);
             setIsMobileMenuOpen(false); // Close menu after selection on mobile
           }}
           onAddBoard={() => {
@@ -257,7 +303,7 @@ export default function Home() {
             <BoardView
               columns={columns}
               onEditTask={handleEditTask}
-              onDeleteTask={handleDeleteTask}
+              onDeleteTask={handleRequestDeleteTask}
               onAddTask={handleAddTask}
               onAddColumn={handleAddColumn}
             />
@@ -292,6 +338,19 @@ export default function Home() {
         onClose={() => setColumnModalOpen(false)}
         onSubmit={handleColumnSubmit}
         boardId={selectedBoardId || ''}
+      />
+
+      <ConfirmationModal
+        isOpen={confirmationOpen}
+        onClose={() => {
+          setConfirmationOpen(false);
+          setTaskToDelete(null);
+        }}
+        onConfirm={handleConfirmDeleteTask}
+        title="Delete Task"
+        message="Are you sure you want to delete this task? This action cannot be undone."
+        confirmText="Delete"
+        variant="danger"
       />
     </div>
   );
