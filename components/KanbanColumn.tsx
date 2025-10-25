@@ -29,7 +29,7 @@ export default function KanbanColumn({
     <div className="flex flex-col min-w-[280px] flex-1">
       <div className="flex items-center gap-2 mb-6">
         <div className={`w-3 h-3 rounded-full ${color}`} />
-        <h2 className="text-gray-400 text-sm font-semibold uppercase tracking-wider">
+        <h2 className="text-text-secondary text-sm font-semibold uppercase tracking-wider">
           {title} ({count})
         </h2>
       </div>
@@ -41,7 +41,7 @@ export default function KanbanColumn({
 
         <button
           onClick={() => onAddTask(status)}
-          className="bg-gradient-to-b from-gray-800 to-gray-850 rounded-lg p-4 text-gray-400 hover:text-purple-400 transition-colors border border-dashed border-gray-700 hover:border-purple-500 text-sm font-medium"
+          className="bg-transparent rounded-lg p-4 text-text-secondary hover:text-text-primary transition-colors border-none text-sm font-medium text-center"
         >
           + Add New Task
         </button>

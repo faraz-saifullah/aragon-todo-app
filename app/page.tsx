@@ -116,21 +116,21 @@ export default function Home() {
 
   if (boardsLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-950">
-        <div className="text-white text-lg">Loading boards...</div>
+      <div className="flex items-center justify-center h-screen bg-surface-secondary">
+        <div className="text-text-primary text-lg">Loading boards...</div>
       </div>
     );
   }
 
   if (boards.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-950">
+      <div className="flex items-center justify-center h-screen bg-surface-secondary">
         <div className="text-center">
-          <h2 className="text-white text-2xl font-bold mb-4">No boards yet</h2>
-          <p className="text-gray-400 mb-6">Create your first board to get started!</p>
+          <h2 className="text-text-primary text-2xl font-bold mb-4">No boards yet</h2>
+          <p className="text-text-secondary mb-6">Create your first board to get started!</p>
           <button
             onClick={handleAddBoard}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            className="bg-surface-accent hover:bg-surface-accent/90 text-text-primary px-6 py-3 rounded-lg font-medium transition-colors"
           >
             Create New Board
           </button>
@@ -145,7 +145,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-950">
+    <div className="flex h-screen bg-surface-secondary">
       <BoardList
         boards={boards}
         selectedBoardId={selectedBoardId}
@@ -155,11 +155,13 @@ export default function Home() {
 
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-gray-900 border-b border-gray-800 px-8 py-6 flex items-center justify-between">
-          <h1 className="text-white text-2xl font-bold">{board?.title || 'Select a board'}</h1>
+        <header className="bg-surface-primary border-b border-surface-secondary px-8 py-6 flex items-center justify-between">
+          <h1 className="text-text-primary text-2xl font-bold">
+            {board?.title || 'Select a board'}
+          </h1>
           <button
-            onClick={handleAddBoard}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
+            onClick={() => handleAddTask('TODO')}
+            className="bg-surface-accent hover:bg-surface-accent/90 text-text-primary px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
           >
             <span>+ Add New Task</span>
           </button>
@@ -175,7 +177,7 @@ export default function Home() {
                   status="TODO"
                   tasks={tasksByStatus.TODO}
                   count={tasksByStatus.TODO.length}
-                  color="bg-cyan-400"
+                  color="bg-status-todo"
                   onEditTask={handleEditTask}
                   onDeleteTask={handleDeleteTask}
                   onAddTask={handleAddTask}
@@ -185,7 +187,7 @@ export default function Home() {
                   status="DOING"
                   tasks={tasksByStatus.DOING}
                   count={tasksByStatus.DOING.length}
-                  color="bg-purple-500"
+                  color="bg-status-doing"
                   onEditTask={handleEditTask}
                   onDeleteTask={handleDeleteTask}
                   onAddTask={handleAddTask}
@@ -195,7 +197,7 @@ export default function Home() {
                   status="DONE"
                   tasks={tasksByStatus.DONE}
                   count={tasksByStatus.DONE.length}
-                  color="bg-green-400"
+                  color="bg-status-done"
                   onEditTask={handleEditTask}
                   onDeleteTask={handleDeleteTask}
                   onAddTask={handleAddTask}
@@ -203,7 +205,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="flex items-center justify-center h-full">
-                <p className="text-gray-400 text-lg">Select a board to view tasks</p>
+                <p className="text-text-secondary text-lg">Select a board to view tasks</p>
               </div>
             )}
           </div>
