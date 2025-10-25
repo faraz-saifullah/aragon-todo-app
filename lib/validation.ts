@@ -1,9 +1,25 @@
 import { z } from 'zod';
 
+/**
+ * Validation schemas for API request bodies
+ * 
+ * Max length rationale:
+ * - Board titles: 100 chars (fits in UI headers, DB varchar limit)
+ * - Task titles: 200 chars (allows more descriptive tasks)
+ * - Descriptions: No limit (flexible for detailed notes)
+ */
+
 // Board validation schemas
 export const createBoardSchema = z.object({
-  title: z.string().min(1, 'Board title is required').max(100, 'Board title is too long'),
-  description: z.string().optional(),
+  title: z
+    .string()
+    .min(1, 'Board title is required')
+    .max(100, 'Board title is too long')
+    .transform((val) => val.trim()),
+  description: z
+    .string()
+    .transform((val) => val.trim())
+    .optional(),
 });
 
 export const updateBoardSchema = z.object({
@@ -11,22 +27,43 @@ export const updateBoardSchema = z.object({
     .string()
     .min(1, 'Board title is required')
     .max(100, 'Board title is too long')
+    .transform((val) => val.trim())
     .optional(),
-  description: z.string().optional().nullable(),
+  description: z
+    .string()
+    .transform((val) => val.trim())
+    .nullable()
+    .optional(),
 });
 
 // Task validation schemas
 export const createTaskSchema = z.object({
-  title: z.string().min(1, 'Task title is required').max(200, 'Task title is too long'),
-  description: z.string().optional(),
+  title: z
+    .string()
+    .min(1, 'Task title is required')
+    .max(200, 'Task title is too long')
+    .transform((val) => val.trim()),
+  description: z
+    .string()
+    .transform((val) => val.trim())
+    .optional(),
   status: z.enum(['TODO', 'DOING', 'DONE']).default('TODO'),
   order: z.number().int().nonnegative().optional(),
   boardId: z.string().uuid('Invalid board ID'),
 });
 
 export const updateTaskSchema = z.object({
-  title: z.string().min(1, 'Task title is required').max(200, 'Task title is too long').optional(),
-  description: z.string().optional().nullable(),
+  title: z
+    .string()
+    .min(1, 'Task title is required')
+    .max(200, 'Task title is too long')
+    .transform((val) => val.trim())
+    .optional(),
+  description: z
+    .string()
+    .transform((val) => val.trim())
+    .nullable()
+    .optional(),
   status: z.enum(['TODO', 'DOING', 'DONE']).optional(),
   order: z.number().int().nonnegative().optional(),
   boardId: z.string().uuid('Invalid board ID').optional(),
