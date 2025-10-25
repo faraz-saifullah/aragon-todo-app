@@ -9,3 +9,20 @@ export const prisma =
   });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+// Graceful shutdown - disconnect Prisma on process termination
+if (process.env.NODE_ENV !== 'test') {
+  process.on('beforeExit', async () => {
+    await prisma.$disconnect();
+  });
+
+  process.on('SIGINT', async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+
+  process.on('SIGTERM', async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+}
