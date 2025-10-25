@@ -7,7 +7,7 @@ import type { CreateBoardInput, UpdateBoardInput } from '../validation';
 
 export async function getAllBoards() {
   return prisma.board.findMany({
-    orderBy: { order: 'asc' },
+    orderBy: { createdAt: 'desc' },
     include: {
       _count: {
         select: { tasks: true },
@@ -28,15 +28,6 @@ export async function getBoardById(id: string) {
 }
 
 export async function createBoard(data: CreateBoardInput) {
-  // If no order specified, set it to be after all existing boards
-  if (data.order === undefined) {
-    const maxOrder = await prisma.board.findFirst({
-      orderBy: { order: 'desc' },
-      select: { order: true },
-    });
-    data.order = (maxOrder?.order ?? -1) + 1;
-  }
-
   return prisma.board.create({
     data,
     include: {

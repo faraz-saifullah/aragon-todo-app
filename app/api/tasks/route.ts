@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getTasksByBoardId, createTask } from '@/lib/services/task.service';
 import { createTaskSchema } from '@/lib/validation';
 import { handleApiError, successResponse } from '@/lib/api-utils';
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const boardId = searchParams.get('boardId');
 
     if (!boardId) {
-      return successResponse({ error: 'boardId query parameter is required' }, 400);
+      return NextResponse.json({ error: 'boardId query parameter is required' }, { status: 400 });
     }
 
     const tasks = await getTasksByBoardId(boardId);

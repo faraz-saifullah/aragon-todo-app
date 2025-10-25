@@ -23,7 +23,9 @@ export async function getTaskById(id: string) {
 
 export async function createTask(data: CreateTaskInput) {
   // If no order specified, set it to be after all existing tasks in the same status
-  if (data.order === undefined) {
+  let orderValue = data.order;
+
+  if (orderValue === undefined) {
     const maxOrder = await prisma.task.findFirst({
       where: {
         boardId: data.boardId,
@@ -32,11 +34,14 @@ export async function createTask(data: CreateTaskInput) {
       orderBy: { order: 'desc' },
       select: { order: true },
     });
-    data.order = (maxOrder?.order ?? -1) + 1;
+    orderValue = (maxOrder?.order ?? -1) + 1;
   }
 
   return prisma.task.create({
-    data,
+    data: {
+      ...data,
+      order: orderValue,
+    },
   });
 }
 

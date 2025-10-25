@@ -12,7 +12,6 @@ async function main() {
     data: {
       title: 'Platform Launch',
       description: 'Main platform launch board',
-      order: 0,
       tasks: {
         create: [
           {
@@ -127,7 +126,6 @@ async function main() {
     data: {
       title: 'Marketing Plan',
       description: 'Marketing strategy and execution',
-      order: 1,
       tasks: {
         create: [
           {
@@ -158,7 +156,6 @@ async function main() {
     data: {
       title: 'Roadmap',
       description: 'Product roadmap and future features',
-      order: 2,
       tasks: {
         create: [
           {

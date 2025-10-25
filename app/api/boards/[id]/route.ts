@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getBoardById, updateBoard, deleteBoard } from '@/lib/services/board.service';
 import { updateBoardSchema } from '@/lib/validation';
 import { handleApiError, successResponse } from '@/lib/api-utils';
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const board = await getBoardById(id);
 
     if (!board) {
-      return successResponse({ error: 'Board not found' }, 404);
+      return NextResponse.json({ error: 'Board not found' }, { status: 404 });
     }
 
     return successResponse(board);

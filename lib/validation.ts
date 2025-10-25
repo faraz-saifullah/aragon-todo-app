@@ -4,7 +4,6 @@ import { z } from 'zod';
 export const createBoardSchema = z.object({
   title: z.string().min(1, 'Board title is required').max(100, 'Board title is too long'),
   description: z.string().optional(),
-  order: z.number().int().nonnegative().optional(),
 });
 
 export const updateBoardSchema = z.object({
@@ -14,7 +13,6 @@ export const updateBoardSchema = z.object({
     .max(100, 'Board title is too long')
     .optional(),
   description: z.string().optional().nullable(),
-  order: z.number().int().nonnegative().optional(),
 });
 
 // Task validation schemas

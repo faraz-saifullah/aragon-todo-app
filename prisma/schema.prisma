@@ -14,7 +14,6 @@ model Board {
   id          String   @id @default(uuid())
   title       String
   description String?
-  order       Int      @default(0)
   tasks       Task[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -30,6 +29,9 @@ model Task {
   board       Board      @relation(fields: [boardId], references: [id], onDelete: Cascade)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+
+  @@index([boardId])
+  @@index([boardId, status, order])
 }
 
 enum TaskStatus {

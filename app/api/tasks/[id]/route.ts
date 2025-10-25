@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getTaskById, updateTask, deleteTask } from '@/lib/services/task.service';
 import { updateTaskSchema } from '@/lib/validation';
 import { handleApiError, successResponse } from '@/lib/api-utils';
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const task = await getTaskById(id);
 
     if (!task) {
-      return successResponse({ error: 'Task not found' }, 404);
+      return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
 
     return successResponse(task);
