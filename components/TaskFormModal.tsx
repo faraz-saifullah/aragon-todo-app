@@ -60,6 +60,13 @@ export default function TaskFormModal({
     return Object.keys(newErrors).length === 0;
   };
 
+  // Validate on blur
+  const handleTitleBlur = () => {
+    if (title) {
+      validate();
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -97,9 +104,12 @@ export default function TaskFormModal({
           label="Task Title"
           value={title}
           onChange={setTitle}
+          onBlur={handleTitleBlur}
           placeholder="e.g., Build UI for onboarding flow"
           error={errors.title}
           required
+          maxLength={200}
+          autoFocus
         />
 
         <TextArea
@@ -108,6 +118,7 @@ export default function TaskFormModal({
           onChange={setDescription}
           placeholder="Add more details about this task..."
           rows={4}
+          maxLength={1000}
         />
 
         <Select

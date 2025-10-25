@@ -65,9 +65,22 @@ interface InputProps {
   placeholder?: string;
   error?: string;
   required?: boolean;
+  maxLength?: number;
+  autoFocus?: boolean;
+  onBlur?: () => void;
 }
 
-export function Input({ label, value, onChange, placeholder, error, required }: InputProps) {
+export function Input({
+  label,
+  value,
+  onChange,
+  placeholder,
+  error,
+  required,
+  maxLength,
+  autoFocus,
+  onBlur,
+}: InputProps) {
   return (
     <div className="mb-4">
       <label className="block text-text-primary text-sm font-medium mb-2">
@@ -77,12 +90,22 @@ export function Input({ label, value, onChange, placeholder, error, required }: 
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
         placeholder={placeholder}
+        maxLength={maxLength}
+        autoFocus={autoFocus}
         className={`w-full bg-surface-secondary border ${
           error ? 'border-red-500' : 'border-surface-primary'
         } rounded-lg px-4 py-3 text-text-primary placeholder-text-muted focus:outline-none focus:border-surface-accent transition-colors`}
       />
-      {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+      <div className="flex justify-between items-center mt-1">
+        {error && <p className="text-red-400 text-xs">{error}</p>}
+        {maxLength && (
+          <p className="text-text-muted text-xs ml-auto">
+            {value.length}/{maxLength}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -94,22 +117,42 @@ interface TextAreaProps {
   placeholder?: string;
   error?: string;
   rows?: number;
+  maxLength?: number;
+  onBlur?: () => void;
 }
 
-export function TextArea({ label, value, onChange, placeholder, error, rows = 4 }: TextAreaProps) {
+export function TextArea({
+  label,
+  value,
+  onChange,
+  placeholder,
+  error,
+  rows = 4,
+  maxLength,
+  onBlur,
+}: TextAreaProps) {
   return (
     <div className="mb-4">
       <label className="block text-text-primary text-sm font-medium mb-2">{label}</label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
         placeholder={placeholder}
         rows={rows}
+        maxLength={maxLength}
         className={`w-full bg-surface-secondary border ${
           error ? 'border-red-500' : 'border-surface-primary'
         } rounded-lg px-4 py-3 text-text-primary placeholder-text-muted focus:outline-none focus:border-surface-accent transition-colors resize-none`}
       />
-      {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+      <div className="flex justify-between items-center mt-1">
+        {error && <p className="text-red-400 text-xs">{error}</p>}
+        {maxLength && (
+          <p className="text-text-muted text-xs ml-auto">
+            {value.length}/{maxLength}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -160,7 +203,7 @@ export function Button({
   disabled,
 }: ButtonProps) {
   const baseStyles =
-    'px-6 py-3 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed';
+    'px-6 py-3 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2';
   const variantStyles =
     variant === 'primary'
       ? 'bg-surface-accent hover:bg-surface-accent/90 text-text-primary'
@@ -173,6 +216,23 @@ export function Button({
       disabled={disabled}
       className={`${baseStyles} ${variantStyles}`}
     >
+      {disabled && (
+        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          />
+        </svg>
+      )}
       {children}
     </button>
   );

@@ -42,6 +42,13 @@ export default function BoardFormModal({ isOpen, onClose, onSubmit, board }: Boa
     return Object.keys(newErrors).length === 0;
   };
 
+  // Validate on blur
+  const handleTitleBlur = () => {
+    if (title) {
+      validate();
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -71,9 +78,12 @@ export default function BoardFormModal({ isOpen, onClose, onSubmit, board }: Boa
           label="Board Title"
           value={title}
           onChange={setTitle}
+          onBlur={handleTitleBlur}
           placeholder="e.g., Platform Launch"
           error={errors.title}
           required
+          maxLength={100}
+          autoFocus
         />
 
         <TextArea
@@ -82,6 +92,7 @@ export default function BoardFormModal({ isOpen, onClose, onSubmit, board }: Boa
           onChange={setDescription}
           placeholder="Brief description of the board..."
           rows={3}
+          maxLength={500}
         />
 
         {errors.submit && <p className="text-red-400 text-sm mb-4">{errors.submit}</p>}

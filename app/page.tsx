@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import BoardView from '@/components/BoardView';
 import BoardFormModal from '@/components/BoardFormModal';
@@ -31,11 +31,12 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Auto-select first board if none selected
-  useState(() => {
+  useEffect(() => {
     if (!selectedBoardId && boards.length > 0) {
       setSelectedBoardId(boards[0].id);
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boards]);
 
   // Group tasks by status
   const tasksByStatus = useMemo(() => {
