@@ -10,7 +10,7 @@ export async function getTasksByBoardId(boardId: string) {
     where: { boardId },
     orderBy: [{ order: 'asc' }],
     include: {
-      status: true,
+      column: true,
       assignee: true,
       creator: true,
     },
@@ -22,7 +22,7 @@ export async function getTaskById(id: string) {
     where: { id },
     include: {
       board: true,
-      status: true,
+      column: true,
       assignee: true,
       creator: true,
     },
@@ -30,13 +30,13 @@ export async function getTaskById(id: string) {
 }
 
 export async function createTask(data: CreateTaskInput) {
-  // If no order specified, set it to be after all existing tasks in the same status
+  // If no order specified, set it to be after all existing tasks in the same column
   let orderValue = data.order;
 
   if (orderValue === undefined) {
     const maxOrder = await prisma.task.findFirst({
       where: {
-        statusId: data.statusId,
+        columnId: data.columnId,
       },
       orderBy: { order: 'desc' },
       select: { order: true },
@@ -48,14 +48,14 @@ export async function createTask(data: CreateTaskInput) {
     data: {
       title: data.title,
       description: data.description,
-      statusId: data.statusId,
+      columnId: data.columnId,
       boardId: data.boardId,
       assigneeId: data.assigneeId,
       creatorId: data.creatorId,
       order: orderValue,
     },
     include: {
-      status: true,
+      column: true,
       assignee: true,
       creator: true,
     },
@@ -67,7 +67,7 @@ export async function updateTask(id: string, data: UpdateTaskInput) {
   const currentTask = await prisma.task.findUnique({
     where: { id },
     include: {
-      status: true,
+      column: true,
       assignee: true,
     },
   });
@@ -84,18 +84,18 @@ export async function updateTask(id: string, data: UpdateTaskInput) {
     newValue: string | null;
   }> = [];
 
-  // Track status change
-  if (data.statusId && data.statusId !== currentTask.statusId) {
-    const newStatus = await prisma.statusColumn.findUnique({
-      where: { id: data.statusId },
+  // Track column change
+  if (data.columnId && data.columnId !== currentTask.columnId) {
+    const newColumn = await prisma.statusColumn.findUnique({
+      where: { id: data.columnId },
     });
 
-    if (newStatus) {
+    if (newColumn) {
       historyEntries.push({
         taskId: id,
-        field: 'status',
-        oldValue: currentTask.status.name,
-        newValue: newStatus.name,
+        field: 'column',
+        oldValue: currentTask.column.name,
+        newValue: newColumn.name,
       });
     }
   }
@@ -145,7 +145,7 @@ export async function updateTask(id: string, data: UpdateTaskInput) {
       where: { id },
       data,
       include: {
-        status: true,
+        column: true,
         assignee: true,
       },
     }),

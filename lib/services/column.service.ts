@@ -106,7 +106,7 @@ export async function deleteColumn(id: string, moveToColumnId: string) {
   return prisma.$transaction(async (tx) => {
     // Get max order in target column to append tasks at the end
     const maxOrder = await tx.task.findFirst({
-      where: { statusId: moveToColumnId },
+      where: { columnId: moveToColumnId },
       orderBy: { order: 'desc' },
       select: { order: true },
     });
@@ -115,15 +115,15 @@ export async function deleteColumn(id: string, moveToColumnId: string) {
 
     // Get all tasks from the column being deleted (ordered)
     const tasksToMove = await tx.task.findMany({
-      where: { statusId: id },
+      where: { columnId: id },
       orderBy: { order: 'asc' },
       select: { id: true },
     });
 
     // Bulk update all tasks to new column
     await tx.task.updateMany({
-      where: { statusId: id },
-      data: { statusId: moveToColumnId },
+      where: { columnId: id },
+      data: { columnId: moveToColumnId },
     });
 
     // Update orders individually (required since order depends on original position)

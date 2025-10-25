@@ -50,8 +50,8 @@ model Task {
   id          String        @id @default(uuid())
   title       String
   description String?
-  statusId    String
-  status      StatusColumn  @relation(fields: [statusId], references: [id], onDelete: Cascade)
+  columnId    String
+  column      StatusColumn  @relation(fields: [columnId], references: [id], onDelete: Cascade)
   order       Int           @default(0)
   boardId     String
   board       Board         @relation(fields: [boardId], references: [id], onDelete: Cascade)
@@ -64,8 +64,8 @@ model Task {
   updatedAt   DateTime      @updatedAt
 
   @@index([boardId])
-  @@index([statusId, order])
-  @@index([boardId, statusId, order])
+  @@index([columnId, order])
+  @@index([boardId, columnId, order])
   @@index([assigneeId])
   @@index([creatorId])
 }
@@ -74,7 +74,7 @@ model TaskHistory {
   id        String   @id @default(uuid())
   taskId    String
   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  field     String // "status", "assignee", "title", "description"
+  field     String // "column", "assignee", "title", "description"
   oldValue  String?
   newValue  String?
   changedAt DateTime @default(now())

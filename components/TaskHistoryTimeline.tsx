@@ -45,7 +45,7 @@ export default function TaskHistoryTimeline({ taskId }: TaskHistoryTimelineProps
 
   const getFieldLabel = (field: string) => {
     const labels: Record<string, string> = {
-      status: 'Status',
+      column: 'Column',
       assignee: 'Assignee',
       title: 'Title',
       description: 'Description',
@@ -55,7 +55,7 @@ export default function TaskHistoryTimeline({ taskId }: TaskHistoryTimelineProps
 
   const getFieldIcon = (field: string) => {
     switch (field) {
-      case 'status':
+      case 'column':
         return (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path

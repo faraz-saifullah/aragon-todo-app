@@ -31,7 +31,7 @@ export default function TaskFormModal({
 }: TaskFormModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [statusId, setStatusId] = useState<string>(defaultColumnId || columns[0]?.id || '');
+  const [columnId, setColumnId] = useState<string>(defaultColumnId || columns[0]?.id || '');
   const [assigneeId, setAssigneeId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -55,12 +55,12 @@ export default function TaskFormModal({
     if (task) {
       setTitle(task.title);
       setDescription(task.description || '');
-      setStatusId(task.statusId);
+      setColumnId(task.columnId);
       setAssigneeId(task.assigneeId);
     } else {
       setTitle('');
       setDescription('');
-      setStatusId(defaultColumnId || columns[0]?.id || '');
+      setColumnId(defaultColumnId || columns[0]?.id || '');
       setAssigneeId(null);
     }
     setErrors({});
@@ -97,13 +97,13 @@ export default function TaskFormModal({
         ? {
             title: title.trim(),
             description: description.trim() || undefined,
-            statusId,
+            columnId,
             assigneeId: assigneeId || null,
           }
         : {
             title: title.trim(),
             description: description.trim() || undefined,
-            statusId,
+            columnId,
             boardId,
             assigneeId: assigneeId || null,
             creatorId: defaultCreatorId,
@@ -141,8 +141,8 @@ export default function TaskFormModal({
 
               <Select
                 label="Column"
-                value={statusId}
-                onChange={(value) => setStatusId(value)}
+                value={columnId}
+                onChange={(value) => setColumnId(value)}
                 options={columnOptions}
               />
             </div>

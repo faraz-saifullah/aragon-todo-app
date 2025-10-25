@@ -34,7 +34,7 @@ export function formatDuration(seconds: number): string {
 
 /**
  * Calculate how long a task has been in its current column
- * by finding the last status change in its history
+ * by finding the last column change in its history
  */
 export function calculateTimeInColumn(
   taskCreatedAt: string | Date,
@@ -42,24 +42,24 @@ export function calculateTimeInColumn(
 ): { duration: string; timestamp: Date } {
   const now = new Date();
 
-  // Find the most recent status change
-  const statusChanges = history?.filter((h) => h.field === 'status') || [];
+  // Find the most recent column change
+  const columnChanges = history?.filter((h) => h.field === 'column') || [];
 
-  let lastStatusChange: Date;
+  let lastColumnChange: Date;
 
-  if (statusChanges.length > 0) {
+  if (columnChanges.length > 0) {
     // Sort by most recent first
-    statusChanges.sort((a, b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime());
-    lastStatusChange = new Date(statusChanges[0].changedAt);
+    columnChanges.sort((a, b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime());
+    lastColumnChange = new Date(columnChanges[0].changedAt);
   } else {
-    // No status changes - use task creation date
-    lastStatusChange = new Date(taskCreatedAt);
+    // No column changes - use task creation date
+    lastColumnChange = new Date(taskCreatedAt);
   }
 
-  const diffInSeconds = Math.floor((now.getTime() - lastStatusChange.getTime()) / 1000);
+  const diffInSeconds = Math.floor((now.getTime() - lastColumnChange.getTime()) / 1000);
 
   return {
     duration: formatDuration(diffInSeconds),
-    timestamp: lastStatusChange,
+    timestamp: lastColumnChange,
   };
 }

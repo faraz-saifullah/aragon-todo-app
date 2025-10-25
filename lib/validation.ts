@@ -47,7 +47,7 @@ export const createTaskSchema = z.object({
     .string()
     .transform((val) => val.trim())
     .optional(),
-  statusId: z.string().uuid('Invalid status column ID'),
+  columnId: z.string().uuid('Invalid column ID'),
   order: z.number().int().nonnegative().optional(),
   boardId: z.string().uuid('Invalid board ID'),
   assigneeId: z.string().uuid('Invalid assignee ID').nullable().optional(),
@@ -66,7 +66,7 @@ export const updateTaskSchema = z.object({
     .transform((val) => val.trim())
     .nullable()
     .optional(),
-  statusId: z.string().uuid('Invalid status column ID').optional(),
+  columnId: z.string().uuid('Invalid column ID').optional(),
   order: z.number().int().nonnegative().optional(),
   boardId: z.string().uuid('Invalid board ID').optional(),
   assigneeId: z.string().uuid('Invalid assignee ID').nullable().optional(),

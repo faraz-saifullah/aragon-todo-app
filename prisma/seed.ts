@@ -73,7 +73,7 @@ async function main() {
       {
         title: 'Build UI for onboarding flow',
         description: 'Create user-friendly onboarding screens',
-        statusId: todoCol.id,
+        columnId: todoCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[0].id, // Sarah
         creatorId: users[0].id,
@@ -82,7 +82,7 @@ async function main() {
       {
         title: 'Build UI for search',
         description: 'Implement search functionality',
-        statusId: todoCol.id,
+        columnId: todoCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[0].id, // Sarah
         creatorId: users[1].id,
@@ -91,7 +91,7 @@ async function main() {
       {
         title: 'Build settings UI',
         description: 'Create settings page',
-        statusId: todoCol.id,
+        columnId: todoCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[1].id, // Mike
         creatorId: users[0].id,
@@ -100,7 +100,7 @@ async function main() {
       {
         title: 'QA and test all major user journeys',
         description: 'Complete end-to-end testing',
-        statusId: todoCol.id,
+        columnId: todoCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[2].id, // Emily
         creatorId: users[0].id,
@@ -110,7 +110,7 @@ async function main() {
       {
         title: 'Design settings and search pages',
         description: 'Complete design for settings and search',
-        statusId: doingCol.id,
+        columnId: doingCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[3].id, // Alex
         creatorId: users[0].id,
@@ -119,7 +119,7 @@ async function main() {
       {
         title: 'Add account management endpoints',
         description: 'Implement account CRUD operations',
-        statusId: doingCol.id,
+        columnId: doingCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[1].id, // Mike
         creatorId: users[1].id,
@@ -128,7 +128,7 @@ async function main() {
       {
         title: 'Design onboarding flow',
         description: 'Create onboarding wireframes and mockups',
-        statusId: doingCol.id,
+        columnId: doingCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[3].id, // Alex
         creatorId: users[3].id,
@@ -137,7 +137,7 @@ async function main() {
       {
         title: 'Add search endpoints',
         description: 'Implement search API',
-        statusId: doingCol.id,
+        columnId: doingCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[1].id, // Mike
         creatorId: users[1].id,
@@ -146,7 +146,7 @@ async function main() {
       {
         title: 'Add authentication endpoints',
         description: 'Implement auth API',
-        statusId: doingCol.id,
+        columnId: doingCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[4].id, // Jessica
         creatorId: users[4].id,
@@ -155,7 +155,7 @@ async function main() {
       {
         title: 'Research pricing points of various competitors',
         description: 'Market research for pricing strategy',
-        statusId: doingCol.id,
+        columnId: doingCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[4].id, // Jessica
         creatorId: users[4].id,
@@ -165,7 +165,7 @@ async function main() {
       {
         title: 'Conduct 5 wireframe tests',
         description: 'User testing of wireframes',
-        statusId: doneCol.id,
+        columnId: doneCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[2].id, // Emily
         creatorId: users[2].id,
@@ -174,7 +174,7 @@ async function main() {
       {
         title: 'Create wireframe prototype',
         description: 'High-fidelity prototype',
-        statusId: doneCol.id,
+        columnId: doneCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[3].id, // Alex
         creatorId: users[3].id,
@@ -183,7 +183,7 @@ async function main() {
       {
         title: 'Review results of usability tests and iterate',
         description: 'Incorporate user feedback',
-        statusId: doneCol.id,
+        columnId: doneCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[2].id, // Emily
         creatorId: users[2].id,
@@ -192,7 +192,7 @@ async function main() {
       {
         title: 'Create paper prototypes and conduct 10 usability tests',
         description: 'Early stage user testing',
-        statusId: doneCol.id,
+        columnId: doneCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[2].id, // Emily
         creatorId: users[0].id,
@@ -201,7 +201,7 @@ async function main() {
       {
         title: 'Market discovery',
         description: 'Research target market',
-        statusId: doneCol.id,
+        columnId: doneCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[4].id, // Jessica
         creatorId: users[4].id,
@@ -210,7 +210,7 @@ async function main() {
       {
         title: 'Competitor analysis',
         description: 'Analyze competitor landscape',
-        statusId: doneCol.id,
+        columnId: doneCol.id,
         boardId: platformLaunch.id,
         assigneeId: users[4].id, // Jessica
         creatorId: users[4].id,
@@ -219,7 +219,7 @@ async function main() {
       {
         title: 'Research the market',
         description: 'Deep market research',
-        statusId: doneCol.id,
+        columnId: doneCol.id,
         boardId: platformLaunch.id,
         creatorId: users[0].id,
         order: 6,
@@ -252,7 +252,7 @@ async function main() {
       {
         title: 'Plan Product Hunt launch',
         description: 'Prepare for Product Hunt launch',
-        statusId: mktTodoCol.id,
+        columnId: mktTodoCol.id,
         boardId: marketingPlan.id,
         creatorId: users[0].id,
         order: 0,
@@ -260,7 +260,7 @@ async function main() {
       {
         title: 'Share on Show HN',
         description: 'Post on Hacker News',
-        statusId: mktTodoCol.id,
+        columnId: mktTodoCol.id,
         boardId: marketingPlan.id,
         creatorId: users[0].id,
         order: 1,
@@ -268,7 +268,7 @@ async function main() {
       {
         title: 'Write launch article to publish on multiple channels',
         description: 'Create launch announcement',
-        statusId: mktDoingCol.id,
+        columnId: mktDoingCol.id,
         boardId: marketingPlan.id,
         creatorId: users[0].id,
         order: 0,
@@ -299,7 +299,7 @@ async function main() {
       {
         title: 'Launch version one',
         description: 'MVP release',
-        statusId: roadmapTodoCol.id,
+        columnId: roadmapTodoCol.id,
         boardId: roadmap.id,
         creatorId: users[0].id,
         order: 0,
@@ -307,7 +307,7 @@ async function main() {
       {
         title: 'Review early feedback and plan next steps',
         description: 'Gather and analyze user feedback',
-        statusId: roadmapTodoCol.id,
+        columnId: roadmapTodoCol.id,
         boardId: roadmap.id,
         creatorId: users[0].id,
         order: 1,

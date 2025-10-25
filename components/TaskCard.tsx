@@ -55,8 +55,9 @@ export default function TaskCard({ task, onEdit, onDelete, isDragging = false }:
       {...attributes}
       {...listeners}
       onClick={handleClick}
-      className={`group bg-surface-primary hover:bg-surface-hover rounded-lg px-3 py-4 md:px-4 md:py-[23px] cursor-grab active:cursor-grabbing transition-all border border-transparent hover:border-surface-accent/30 ${isSortableDragging ? 'opacity-50 scale-105 border-surface-accent' : ''
-        } ${isDragging ? 'border-surface-accent' : ''}`}
+      className={`group bg-surface-primary hover:bg-surface-hover rounded-lg px-3 py-4 md:px-4 md:py-[23px] cursor-grab active:cursor-grabbing transition-all border border-transparent hover:border-surface-accent/30 ${
+        isSortableDragging ? 'opacity-50 scale-105 border-surface-accent' : ''
+      } ${isDragging ? 'border-surface-accent' : ''}`}
     >
       <h3 className="text-text-primary font-bold text-[14px] md:text-[15px] mb-1.5 md:mb-2 leading-[18px] md:leading-[19px]">
         {task.title}
@@ -86,7 +87,7 @@ export default function TaskCard({ task, onEdit, onDelete, isDragging = false }:
             </span>
           </div>
         ) : (
-            <div></div>
+          <div></div>
         )}
 
         {/* Right side: Delete button - shown on hover, hidden when dragging */}

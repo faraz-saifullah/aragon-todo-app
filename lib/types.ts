@@ -28,14 +28,14 @@ export interface Task {
   id: string;
   title: string;
   description: string | null;
-  statusId: string;
+  columnId: string;
   order: number;
   boardId: string;
   assigneeId: string | null;
   assignee?: User; // Populated when included
   creatorId: string;
   creator?: User; // Populated when included
-  status?: StatusColumn; // The actual status column object when populated
+  column?: StatusColumn; // The actual column object when populated
   history?: TaskHistory[]; // Task history when included
   createdAt: string;
   updatedAt: string;
@@ -65,7 +65,7 @@ export interface Board {
 export interface CreateTaskForm {
   title: string;
   description?: string;
-  statusId: string;
+  columnId: string;
   boardId: string;
   assigneeId?: string | null;
   creatorId: string;
@@ -74,7 +74,7 @@ export interface CreateTaskForm {
 export interface UpdateTaskForm {
   title?: string;
   description?: string;
-  statusId?: string;
+  columnId?: string;
   assigneeId?: string | null;
 }
 

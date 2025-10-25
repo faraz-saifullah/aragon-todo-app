@@ -99,7 +99,7 @@ export default function BoardView({
         const response = await fetch(`/api/tasks/${taskId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ statusId: targetColumnId }),
+          body: JSON.stringify({ columnId: targetColumnId }),
         });
 
         if (!response.ok) {

@@ -6,9 +6,10 @@ import { handleApiError } from '@/lib/api-utils';
  * GET /api/tasks/:id/history
  * Get history of changes for a specific task
  */
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const history = await getTaskHistory(params.id);
+    const { id } = await params;
+    const history = await getTaskHistory(id);
     return Response.json({ history });
   } catch (error) {
     return handleApiError(error);
