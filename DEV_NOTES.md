@@ -322,12 +322,18 @@ npm run start
    - Would use WebSockets for production
 
 4. **No Drag & Drop**
-   - Would use dnd-kit library
+   - Would use dnd-kit library for task/column reordering
    - Requires additional complexity
 
 5. **No Optimistic UI Updates**
    - UI waits for API response
    - Could add for better perceived performance
+
+## Recent Feature Additions
+
+- **Custom Columns** (NEW): Full support for creating custom status columns beyond TODO/DOING/DONE
+- **Persistent Board Selection**: Uses localStorage to remember last selected board
+- **Column Color Coding**: Each column can have its own color for visual organization
 
 ## Production Checklist
 
