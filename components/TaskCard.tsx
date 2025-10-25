@@ -17,18 +17,24 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
     }
   };
 
+  // Count subtasks (just for display, can be enhanced later)
+  const subtaskCount = task.description ? 1 : 0;
+  const completedSubtasks = 0;
+
   return (
     <div
       onClick={() => onEdit(task)}
-      className="group bg-surface-primary rounded-lg p-4 cursor-pointer hover:bg-surface-primary/80 transition-all hover:shadow-lg border border-surface-primary hover:border-surface-accent/30"
+      className="group bg-surface-primary rounded-lg px-4 py-[23px] cursor-pointer hover:bg-surface-primary/80 transition-all shadow-[0_4px_6px_0_rgba(54,78,126,0.101545)] hover:shadow-lg"
     >
-      <h3 className="text-text-primary font-medium text-sm mb-2 line-clamp-2">{task.title}</h3>
+      <h3 className="text-text-primary font-bold text-[15px] mb-2 leading-[19px]">{task.title}</h3>
 
       {task.description && (
-        <p className="text-text-secondary text-xs mb-3 line-clamp-3">{task.description}</p>
+        <p className="text-text-secondary text-xs font-bold mb-0">
+          {completedSubtasks} of {subtaskCount} substasks
+        </p>
       )}
 
-      <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity mt-2">
         <button
           onClick={handleDelete}
           className="text-red-400 hover:text-red-300 text-xs font-medium"

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import BoardList from '@/components/BoardList';
+import Navigation from '@/components/Navigation';
 import KanbanColumn from '@/components/KanbanColumn';
 import BoardFormModal from '@/components/BoardFormModal';
 import TaskFormModal from '@/components/TaskFormModal';
@@ -130,7 +130,7 @@ export default function Home() {
           <p className="text-text-secondary mb-6">Create your first board to get started!</p>
           <button
             onClick={handleAddBoard}
-            className="bg-surface-accent hover:bg-surface-accent/90 text-text-primary px-6 py-3 rounded-lg font-medium transition-colors"
+            className="bg-surface-accent hover:bg-surface-accent/90 text-text-primary px-6 py-3 rounded-full font-medium transition-colors"
           >
             Create New Board
           </button>
@@ -146,30 +146,40 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-surface-secondary">
-      <BoardList
+      {/* LEFT SECTION: Global App Navigation */}
+      <Navigation
         boards={boards}
         selectedBoardId={selectedBoardId}
         onSelectBoard={setSelectedBoardId}
         onAddBoard={handleAddBoard}
       />
 
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-surface-primary border-b border-surface-secondary px-8 py-6 flex items-center justify-between">
-          <h1 className="text-text-primary text-2xl font-bold">
+      {/* RIGHT SECTION: Main App Content */}
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        {/* Content Header - Board-specific actions */}
+        <header
+          role="banner"
+          className="bg-surface-primary border-b border-[#3E3F4E] px-6 py-5 md:px-8 md:py-6 flex items-center justify-between h-[80px] md:h-[96px] flex-shrink-0"
+        >
+          <h1 className="text-text-primary text-lg md:text-xl lg:text-2xl font-bold truncate">
             {board?.title || 'Select a board'}
           </h1>
           <button
             onClick={() => handleAddTask('TODO')}
-            className="bg-surface-accent hover:bg-surface-accent/90 text-text-primary px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
+            className="bg-surface-accent hover:bg-surface-accent/90 text-text-primary px-4 py-2 md:px-6 md:py-3 rounded-full font-medium transition-colors text-sm md:text-base flex-shrink-0"
+            aria-label="Add new task"
           >
-            <span>+ Add New Task</span>
+            + Add New Task
           </button>
         </header>
 
-        {/* Kanban Board */}
-        <div className="flex-1 overflow-x-auto overflow-y-hidden">
-          <div className="h-full p-8">
+        {/* Content Body - Kanban Board Area */}
+        <main
+          role="main"
+          className="flex-1 overflow-x-auto overflow-y-hidden"
+          aria-label="Kanban board"
+        >
+          <div className="h-full px-4 py-6 md:px-6 md:py-6">
             {board ? (
               <div className="flex gap-6 h-full">
                 <KanbanColumn
@@ -209,10 +219,10 @@ export default function Home() {
               </div>
             )}
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
 
-      {/* Modals */}
+      {/* Modals - Overlay Layer */}
       <BoardFormModal
         isOpen={boardModalOpen}
         onClose={() => setBoardModalOpen(false)}
