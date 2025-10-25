@@ -73,7 +73,9 @@ Default credentials (from `.env`):
    npm run seed
    ```
 
+   - Creates 5 dummy users (Sarah, Mike, Emily, Alex, Jessica)
    - Creates 3 sample boards with 22 tasks
+   - Tasks are assigned to users with complete history tracking
    - Based on the Platform Launch example from the design
 
 7. **Start development server**
@@ -178,15 +180,16 @@ Opens Prisma Studio at http://localhost:5555 - a GUI for viewing/editing data.
 ### Backend
 
 - `/app/api/` - API route handlers
-- `/lib/services/` - Business logic
+- `/lib/services/` - Business logic (board, task, column, user services)
 - `/lib/validation.ts` - Zod schemas
 - `/lib/db.ts` - Prisma client
 
 ### Frontend
 
 - `/app/page.tsx` - Main application component
-- `/components/` - Reusable UI components
-- `/lib/hooks.ts` - Custom React hooks
+- `/components/` - Reusable UI components (11 components)
+- `/contexts/` - React contexts (Toast notifications)
+- `/lib/hooks.ts` - Custom React hooks (useBoards, useBoard, useTasks, useUsers)
 - `/lib/types.ts` - TypeScript types
 
 ### Config
@@ -307,33 +310,42 @@ npm run start
 
 ## Known Limitations
 
-1. **window.confirm for Delete**
-   - Currently uses browser confirm dialog
-   - Should implement custom styled modal (identified in code review)
-
-2. **Limited Test Coverage**
+1. **Limited Test Coverage**
    - 9 tests covering API routes and service layer
    - Would add component tests with React Testing Library for production
    - Would add E2E tests with Playwright
 
-3. **No Real-time Updates**
+2. **No Real-time Updates**
    - Updates are instant on same client
    - Multiple users need to refresh
    - Would use WebSockets for production
 
-4. **No Drag & Drop**
+3. **No Drag & Drop**
    - Would use dnd-kit library for task/column reordering
    - Requires additional complexity
 
-5. **No Optimistic UI Updates**
+4. **No Optimistic UI Updates**
    - UI waits for API response
    - Could add for better perceived performance
 
 ## Recent Feature Additions
 
-- **Custom Columns** (NEW): Full support for creating custom status columns beyond TODO/DOING/DONE
+### Core Features
+
+- **Custom Columns**: Full support for creating custom status columns beyond TODO/DOING/DONE
+- **User Assignment**: Assign tasks to team members with avatar display on task cards
+- **Task History**: Complete audit trail tracking all changes (status, assignee, title, description)
+- **Toast Notifications**: Success/error feedback for all user actions
+- **Confirmation Modals**: Professional confirmation dialogs for destructive actions
 - **Persistent Board Selection**: Uses localStorage to remember last selected board
 - **Column Color Coding**: Each column can have its own color for visual organization
+
+### Technical Improvements
+
+- **Database Transactions**: Board creation includes default columns in a single transaction
+- **Optimized Queries**: Includes for assignee and creator data to prevent N+1 queries
+- **History Tracking**: Automatic task history recording via middleware
+- **Context API**: Toast notification system using React Context
 
 ## Production Checklist
 

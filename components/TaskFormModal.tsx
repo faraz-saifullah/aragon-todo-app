@@ -98,15 +98,15 @@ export default function TaskFormModal({
             title: title.trim(),
             description: description.trim() || undefined,
             statusId,
-          assigneeId: assigneeId || null,
+            assigneeId: assigneeId || null,
           }
         : {
             title: title.trim(),
             description: description.trim() || undefined,
             statusId,
             boardId,
-          assigneeId: assigneeId || null,
-          creatorId: defaultCreatorId,
+            assigneeId: assigneeId || null,
+            creatorId: defaultCreatorId,
           };
       await onSubmit(data);
       onClose();

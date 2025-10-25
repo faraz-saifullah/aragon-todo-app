@@ -1,5 +1,17 @@
+import { useState } from 'react';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCorners,
+} from '@dnd-kit/core';
 import type { Task, StatusColumn } from '@/lib/types';
 import KanbanColumn from './KanbanColumn';
+import TaskCard from './TaskCard';
 
 interface BoardViewProps {
   columns: StatusColumn[];
@@ -7,6 +19,7 @@ interface BoardViewProps {
   onDeleteTask: (taskId: string) => void;
   onAddTask: (columnId: string) => void;
   onAddColumn: () => void;
+  onTaskUpdate: () => Promise<void>; // Refetch board after drag
 }
 
 /**
@@ -19,7 +32,94 @@ export default function BoardView({
   onDeleteTask,
   onAddTask,
   onAddColumn,
+  onTaskUpdate,
 }: BoardViewProps) {
+  const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+  // Configure sensors for drag detection
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px movement required to start drag (prevents accidental drags)
+      },
+    })
+  );
+
+  // Find task by ID across all columns
+  const findTask = (taskId: string): Task | undefined => {
+    for (const column of columns) {
+      const task = column.tasks?.find((t) => t.id === taskId);
+      if (task) return task;
+    }
+    return undefined;
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const taskId = event.active.id as string;
+    const task = findTask(taskId);
+    setActiveTask(task || null);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    setActiveTask(null);
+
+    if (!over) return;
+
+    const taskId = active.id as string;
+    const overId = over.id as string;
+
+    // Find which column was dropped on
+    let targetColumnId: string | null = null;
+
+    // Check if dropped directly on a column
+    const column = columns.find((col) => col.id === overId);
+    if (column) {
+      targetColumnId = column.id;
+    } else {
+      // Dropped on another task - find which column that task belongs to
+      for (const col of columns) {
+        if (col.tasks?.some((t) => t.id === overId)) {
+          targetColumnId = col.id;
+          break;
+        }
+      }
+    }
+
+    if (!targetColumnId) return;
+
+    // Find source column
+    const sourceColumnId = columns.find((col) => col.tasks?.some((t) => t.id === taskId))?.id;
+
+    // Only move if actually changed columns
+    if (sourceColumnId && targetColumnId !== sourceColumnId) {
+      try {
+        // Use existing PUT /api/tasks/:id endpoint
+        const response = await fetch(`/api/tasks/${taskId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ statusId: targetColumnId }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to move task');
+        }
+
+        // Refetch board to get updated data with history
+        await onTaskUpdate();
+      } catch (error) {
+        console.error('Error moving task:', error);
+        // Refetch anyway to restore correct state
+        await onTaskUpdate();
+      }
+    }
+  };
+
+  const handleDragCancel = () => {
+    setActiveTask(null);
+  };
+
   // Get color info for a column
   const getColumnColor = (
     columnName: string,
@@ -60,41 +160,58 @@ export default function BoardView({
   }
 
   return (
-    <div className="h-full overflow-x-auto overflow-y-auto">
-      <div className="px-3 py-4 md:px-4 md:py-6 lg:px-6 lg:py-6 min-w-min h-full">
-        <div className="flex gap-4 md:gap-6 h-full items-start">
-          {columns.map((column) => {
-            const colorInfo = getColumnColor(column.name, column.color);
-            return (
-              <KanbanColumn
-                key={column.id}
-                columnId={column.id}
-                title={column.name}
-                tasks={column.tasks || []}
-                count={(column.tasks || []).length}
-                colorClassName={colorInfo.className}
-                colorStyle={colorInfo.style}
-                onEditTask={onEditTask}
-                onDeleteTask={onDeleteTask}
-                onAddTask={() => onAddTask(column.id)}
-              />
-            );
-          })}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
+    >
+      <div className="h-full overflow-x-auto overflow-y-auto">
+        <div className="px-3 py-4 md:px-4 md:py-6 lg:px-6 lg:py-6 min-w-min h-full">
+          <div className="flex gap-4 md:gap-6 h-full items-start">
+            {columns.map((column) => {
+              const colorInfo = getColumnColor(column.name, column.color);
+              return (
+                <KanbanColumn
+                  key={column.id}
+                  columnId={column.id}
+                  title={column.name}
+                  tasks={column.tasks || []}
+                  count={(column.tasks || []).length}
+                  colorClassName={colorInfo.className}
+                  colorStyle={colorInfo.style}
+                  onEditTask={onEditTask}
+                  onDeleteTask={onDeleteTask}
+                  onAddTask={() => onAddTask(column.id)}
+                />
+              );
+            })}
 
-          {/* Add New Column Button */}
-          <div className="flex flex-col min-w-[240px] w-[240px] md:min-w-[280px] md:w-[280px]">
-            <button
-              onClick={onAddColumn}
-              className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 flex-shrink-0 group cursor-pointer hover:opacity-80 transition-opacity"
-            >
-              <div className="w-[12px] h-[12px] md:w-[15px] md:h-[15px] rounded-full bg-text-secondary group-hover:bg-surface-accent transition-colors" />
-              <h2 className="text-text-secondary group-hover:text-surface-accent text-[10px] md:text-xs font-bold uppercase tracking-[2px] md:tracking-[2.4px] transition-colors">
-                + New Column
-              </h2>
-            </button>
+            {/* Add New Column Button */}
+            <div className="flex flex-col min-w-[240px] w-[240px] md:min-w-[280px] md:w-[280px]">
+              <button
+                onClick={onAddColumn}
+                className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6 flex-shrink-0 group cursor-pointer hover:opacity-80 transition-opacity"
+              >
+                <div className="w-[12px] h-[12px] md:w-[15px] md:h-[15px] rounded-full bg-text-secondary group-hover:bg-surface-accent transition-colors" />
+                <h2 className="text-text-secondary group-hover:text-surface-accent text-[10px] md:text-xs font-bold uppercase tracking-[2px] md:tracking-[2.4px] transition-colors">
+                  + New Column
+                </h2>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Drag Overlay - Shows preview of card being dragged */}
+      <DragOverlay>
+        {activeTask && (
+          <div className="rotate-3 opacity-90">
+            <TaskCard task={activeTask} onEdit={() => {}} onDelete={() => {}} isDragging />
+          </div>
+        )}
+      </DragOverlay>
+    </DndContext>
   );
 }

@@ -360,6 +360,7 @@ export default function Home() {
               onDeleteTask={handleRequestDeleteTask}
               onAddTask={handleAddTask}
               onAddColumn={handleAddColumn}
+              onTaskUpdate={refetchBoard}
             />
           ) : (
             <div className="flex items-center justify-center h-full">

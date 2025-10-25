@@ -31,6 +31,10 @@ npm run dev
 
 - ✅ **Full CRUD Operations** - Create, read, update, and delete boards, tasks, and columns
 - 🎨 **Custom Columns** - Create your own status columns beyond TODO/DOING/DONE with custom colors
+- 👥 **User Assignment** - Assign tasks to team members with avatar display
+- 📜 **Task History** - Track all changes to tasks with detailed audit trail
+- 🔔 **Toast Notifications** - Success/error feedback for all user actions
+- ⚠️ **Confirmation Modals** - Professional confirmation dialogs for destructive actions
 - 🌈 **Color Coding** - Visual status indicators with customizable column colors
 - 🔄 **Real-time Updates** - Instant UI updates after any operation
 - ✨ **Enhanced Form Validation** - Client-side and server-side validation with onBlur validation, character counters, and auto-focus
@@ -93,11 +97,15 @@ aragon-todo-app/
 │   ├── BoardList.tsx             # Sidebar with board navigation
 │   ├── BoardView.tsx             # Kanban board layout container
 │   ├── KanbanColumn.tsx          # Dynamic status columns
-│   ├── TaskCard.tsx              # Individual task card
+│   ├── TaskCard.tsx              # Individual task card (with assignee avatar)
 │   ├── Modal.tsx                 # Reusable modal and form components
 │   ├── BoardFormModal.tsx        # Create/edit board modal
-│   ├── TaskFormModal.tsx         # Create/edit task modal
-│   └── ColumnFormModal.tsx       # Create/edit column modal (NEW)
+│   ├── TaskFormModal.tsx         # Create/edit task modal (with history)
+│   ├── ColumnFormModal.tsx       # Create/edit column modal
+│   ├── ConfirmModal.tsx          # Confirmation dialog for destructive actions
+│   └── ToastContainer.tsx        # Toast notifications for feedback
+├── contexts/
+│   └── ToastContext.tsx          # Toast notification context
 ├── lib/
 │   ├── db.ts                     # Prisma client instance
 │   ├── types.ts                  # TypeScript type definitions
@@ -107,7 +115,8 @@ aragon-todo-app/
 │   └── services/
 │       ├── board.service.ts      # Board database operations
 │       ├── task.service.ts       # Task database operations
-│       └── column.service.ts     # Column database operations (NEW)
+│       ├── column.service.ts     # Column database operations
+│       └── user.service.ts       # User database operations
 ├── __tests__/                    # Test files
 │   ├── api/
 │   │   └── boards.test.ts        # API route tests
@@ -220,16 +229,51 @@ npm run db:studio    # Open Prisma Studio (database GUI)
 
 ## 🗄️ Database Schema
 
+### User Model
+
+```prisma
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  avatar        String?  // Avatar initials or URL
+  assignedTasks Task[]   @relation("TaskAssignee")
+  createdTasks  Task[]   @relation("TaskCreator")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+```
+
 ### Board Model
 
 ```prisma
 model Board {
-  id          String   @id @default(uuid())
+  id          String         @id @default(uuid())
   title       String
   description String?
   tasks       Task[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  columns     StatusColumn[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+```
+
+### StatusColumn Model
+
+```prisma
+model StatusColumn {
+  id        String   @id @default(uuid())
+  boardId   String
+  name      String   // "TODO", "In Review", "Blocked", etc.
+  order     Int      // Display order
+  color     String?  // Hex color like "#FF6B6B"
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([boardId, order])
+  @@unique([boardId, name]) // Prevent duplicate column names per board
 }
 ```
 
@@ -237,38 +281,57 @@ model Board {
 
 ```prisma
 model Task {
-  id          String     @id @default(uuid())
+  id          String        @id @default(uuid())
   title       String
   description String?
-  status      TaskStatus @default(TODO)
-  order       Int        @default(0)
+  statusId    String
+  status      StatusColumn  @relation(fields: [statusId], references: [id], onDelete: Cascade)
+  order       Int           @default(0)
   boardId     String
-  board       Board      @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  board       Board         @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  assigneeId  String?
+  assignee    User?         @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  creatorId   String
+  creator     User          @relation("TaskCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  history     TaskHistory[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   @@index([boardId])
-  @@index([boardId, status, order])
+  @@index([statusId, order])
+  @@index([boardId, statusId, order])
+  @@index([assigneeId])
+  @@index([creatorId])
 }
+```
 
-enum TaskStatus {
-  TODO
-  DOING
-  DONE
+### TaskHistory Model
+
+```prisma
+model TaskHistory {
+  id        String   @id @default(uuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  field     String   // "status", "assignee", "title", "description"
+  oldValue  String?
+  newValue  String?
+  changedAt DateTime @default(now())
+
+  @@index([taskId, changedAt])
 }
 ```
 
 **Key Features:**
 
 - UUID primary keys for scalability
+- **User management** - Assign and track task creators and assignees
+- **Task history** - Complete audit trail of all task changes
 - Cascade delete (deleting a board deletes its columns and tasks)
 - **Custom columns** - Each board can have its own set of status columns with custom colors
 - **Flexible workflow** - Not limited to TODO/DOING/DONE
 - Database indexes on critical fields for query performance
 - Unique constraint prevents duplicate column names per board
 - Timestamps for audit trails
-
-**Note:** The schema has been updated to use `StatusColumn` model for flexible, custom columns. The old `TaskStatus` enum is deprecated.
 
 ## 🔌 API Endpoints
 
@@ -282,7 +345,7 @@ enum TaskStatus {
 | PUT    | `/api/boards/:id` | Update a board                 |
 | DELETE | `/api/boards/:id` | Delete a board (and its tasks) |
 
-### Columns (NEW)
+### Columns
 
 | Method | Endpoint           | Description                     |
 | ------ | ------------------ | ------------------------------- |
@@ -290,6 +353,12 @@ enum TaskStatus {
 | POST   | `/api/columns`     | Create a new column             |
 | PUT    | `/api/columns/:id` | Update a column (name/color)    |
 | DELETE | `/api/columns/:id` | Delete a column (and its tasks) |
+
+### Users
+
+| Method | Endpoint     | Description   |
+| ------ | ------------ | ------------- |
+| GET    | `/api/users` | Get all users |
 
 ### Tasks
 
@@ -340,8 +409,10 @@ Content-Type: application/json
 {
   "title": "Design homepage",
   "description": "Create mockups for the homepage",
-  "status": "TODO",
-  "boardId": "board-uuid"
+  "statusId": "column-uuid",
+  "boardId": "board-uuid",
+  "assigneeId": "user-uuid",
+  "creatorId": "user-uuid"
 }
 ```
 
@@ -371,11 +442,13 @@ The app uses CSS custom properties defined in `app/globals.css`:
 
 ### State Management
 
-The app uses React hooks for state management:
+The app uses React hooks and Context API for state management:
 
 - `useBoards` - Manages boards list and CRUD operations
 - `useBoard` - Fetches a single board with tasks
 - `useTasks` - Manages tasks for a specific board
+- `useUsers` - Fetches users for task assignment
+- `ToastContext` - Global toast notification system
 
 ### Form Validation
 
@@ -413,8 +486,10 @@ See `__tests__/README.md` for detailed test documentation.
 
 Business logic is separated into service files:
 
-- `board.service.ts` - Board operations
-- `task.service.ts` - Task operations
+- `board.service.ts` - Board operations (includes transaction for default columns)
+- `task.service.ts` - Task operations (includes history tracking)
+- `column.service.ts` - Column operations
+- `user.service.ts` - User operations
 
 This keeps API routes clean and testable.
 
@@ -478,8 +553,6 @@ If given more time, here are enhancements that could be added:
 
 - **Drag & Drop**: Implement drag-and-drop for tasks between columns using dnd-kit
 - **Optimistic Updates**: Update UI before API response for snappier UX
-- **Custom Confirmation Modal**: Replace window.confirm with styled modal
-- **Toast Notifications**: Success/error toast messages instead of alerts
 - **Expand Test Coverage**: Add component tests with React Testing Library
 
 ### Medium Priority
@@ -487,9 +560,9 @@ If given more time, here are enhancements that could be added:
 - **User Authentication**: Multi-user support with NextAuth.js
 - **Task Search**: Search and filter tasks across boards
 - **Due Dates**: Add deadlines and reminders to tasks
-- **Task Assignees**: Assign tasks to team members
 - **Task Comments**: Add discussion threads to tasks
 - **Column Reordering**: Drag-and-drop to reorder columns
+- **Pagination**: Add pagination for large task lists
 
 ### Nice to Have
 
@@ -559,4 +632,4 @@ Built as part of the Aragon.ai technical assessment. Design inspiration from mod
 ---
 
 **Developer**: Built with ❤️ using Next.js, TypeScript, and PostgreSQL
-**Time**: ~2.5 hours of focused development
+**Last Updated**: October 25, 2025

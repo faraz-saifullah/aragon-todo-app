@@ -36,8 +36,18 @@ export interface Task {
   creatorId: string;
   creator?: User; // Populated when included
   status?: StatusColumn; // The actual status column object when populated
+  history?: TaskHistory[]; // Task history when included
   createdAt: string;
   updatedAt: string;
+}
+
+export interface TaskHistory {
+  id: string;
+  taskId: string;
+  field: string;
+  oldValue: string | null;
+  newValue: string | null;
+  changedAt: string;
 }
 
 export interface Board {

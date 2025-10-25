@@ -28,6 +28,10 @@ export async function getBoardById(id: string) {
             include: {
               assignee: true,
               creator: true,
+              history: {
+                orderBy: { changedAt: 'desc' },
+                take: 10, // Only fetch last 10 history entries for performance
+              },
             },
           },
         },
