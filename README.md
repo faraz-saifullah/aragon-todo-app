@@ -1,36 +1,45 @@
 # Kanban Task Management App
 
-A modern, full-stack task management application built with Next.js, TypeScript, Prisma, and PostgreSQL. Features a beautiful dark-themed Kanban interface with full CRUD operations for boards and tasks.
+A modern, full-stack task management application built with Next.js, TypeScript, Prisma, and PostgreSQL. Features a beautiful dark-themed Kanban interface with full CRUD operations, comprehensive testing, and professional-grade responsive design.
 
 ![Kanban App](aragon-sample-ui.webp)
 
 ## 🚀 Features
 
 - ✅ **Full CRUD Operations** - Create, read, update, and delete boards and tasks
-- 🎨 **Modern Dark UI** - Beautiful, responsive Kanban interface inspired by modern design
+- 🎨 **Modern Dark UI** - Beautiful, pixel-perfect Kanban interface
 - 🔄 **Real-time Updates** - Instant UI updates after any operation
-- ✨ **Form Validation** - Client-side and server-side validation using Zod
+- ✨ **Enhanced Form Validation** - Client-side and server-side validation with onBlur validation, character counters, and auto-focus
 - 🎯 **Type Safety** - Full TypeScript coverage throughout the application
-- 🗄️ **PostgreSQL Database** - Robust database with Prisma ORM
+- 🗄️ **PostgreSQL Database** - Robust database with Prisma ORM and optimized indexes
 - 🐳 **Docker Setup** - Easy local development with Docker Compose
-- 📱 **Responsive Design** - Works seamlessly on desktop and mobile devices
-- 🎭 **Hover States** - Interactive feedback on all elements
+- 📱 **Fully Responsive** - Mobile-first design with hamburger menu, works on all devices
+- 🎭 **Professional UX** - Hover states, loading spinners, empty states, status indicators
+- 🧪 **Test Coverage** - 9 passing tests covering API routes and service layer
 
 ## 📋 Tech Stack
 
 ### Frontend
 
 - **Next.js 16** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first CSS framework
-- **React Hooks** - State management (useState, useEffect, useCallback)
+- **TypeScript** - Type-safe development with strict mode
+- **Tailwind CSS 4** - Utility-first CSS with custom theme (`@theme` directive)
+- **React Hooks** - State management (useState, useEffect, useCallback, useMemo)
+- **Plus Jakarta Sans** - Custom Google Font
 
 ### Backend
 
 - **Next.js API Routes** - Serverless API endpoints
-- **Prisma** - Modern ORM for database operations
+- **Prisma** - Modern ORM with database indexes
 - **Zod** - Schema validation library
 - **PostgreSQL** - Relational database
+
+### Testing & Quality
+
+- **Jest** - Testing framework
+- **9 Passing Tests** - API routes + service layer coverage
+- **ESLint** - Code linting
+- **Prettier** - Code formatting
 
 ### Infrastructure
 
@@ -55,7 +64,9 @@ aragon-todo-app/
 │   ├── page.tsx                  # Main Kanban board page
 │   └── globals.css               # Global styles
 ├── components/
+│   ├── Navigation.tsx            # Main navigation wrapper
 │   ├── BoardList.tsx             # Sidebar with board navigation
+│   ├── BoardView.tsx             # Kanban board layout container
 │   ├── KanbanColumn.tsx          # Column for TODO/DOING/DONE
 │   ├── TaskCard.tsx              # Individual task card
 │   ├── Modal.tsx                 # Reusable modal and form components
@@ -70,11 +81,18 @@ aragon-todo-app/
 │   └── services/
 │       ├── board.service.ts      # Board database operations
 │       └── task.service.ts       # Task database operations
+├── __tests__/                    # Test files
+│   ├── api/
+│   │   └── boards.test.ts        # API route tests
+│   ├── services/
+│   │   └── board.service.test.ts # Service layer tests
+│   └── test-utils.ts             # Test utilities
 ├── prisma/
 │   ├── schema.prisma             # Database schema
 │   └── seed.ts                   # Seed data script
 ├── docker-compose.yml            # PostgreSQL container setup
-└── .env                          # Environment variables
+├── .env                          # Environment variables
+└── .env.example                  # Environment template
 ```
 
 ## 🛠️ Setup & Installation
@@ -100,11 +118,27 @@ npm install
 
 ### 3. Set Up Environment Variables
 
-The `.env` file should already exist with the following configuration:
+Create a `.env` file by copying the example:
+
+```bash
+cp .env.example .env
+```
+
+The `.env.example` file contains:
 
 ```env
+# Database Configuration
 DATABASE_URL="postgresql://dev:devpassword@localhost:5432/aragon_dev?schema=public"
+
+# PostgreSQL Docker Configuration
+POSTGRES_USER=dev
+POSTGRES_PASSWORD=devpassword
+POSTGRES_DB=aragon_dev
+POSTGRES_PORT=5432
+
+# Application Configuration
 PORT=3000
+NODE_ENV=development
 ```
 
 ### 4. Start PostgreSQL with Docker
@@ -121,7 +155,7 @@ This will start a PostgreSQL container in the background.
 npm run migrate
 ```
 
-When prompted, provide a migration name (e.g., "init").
+This creates the necessary database tables based on the Prisma schema.
 
 ### 6. Seed the Database
 
@@ -145,6 +179,11 @@ The application will be available at [http://localhost:3000](http://localhost:30
 npm run dev          # Start development server
 npm run build        # Build for production
 npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run format       # Format code with Prettier
+npm run test         # Run Jest tests
+npm run test:watch   # Run tests in watch mode
+npm run test:coverage # Run tests with coverage report
 npm run db:up        # Start PostgreSQL container
 npm run db:down      # Stop PostgreSQL container
 npm run migrate      # Run Prisma migrations
@@ -161,7 +200,6 @@ model Board {
   id          String   @id @default(uuid())
   title       String
   description String?
-  order       Int      @default(0)
   tasks       Task[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -181,6 +219,9 @@ model Task {
   board       Board      @relation(fields: [boardId], references: [id], onDelete: Cascade)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+
+  @@index([boardId])
+  @@index([boardId, status, order])
 }
 
 enum TaskStatus {
@@ -189,6 +230,13 @@ enum TaskStatus {
   DONE
 }
 ```
+
+**Key Features:**
+
+- UUID primary keys for scalability
+- Cascade delete (deleting a board deletes its tasks)
+- Database indexes on `boardId`, `status`, and `order` for query performance
+- Timestamps for audit trails
 
 ## 🔌 API Endpoints
 
@@ -258,21 +306,25 @@ Content-Type: application/json
 
 ## 🎨 Design System
 
-### Color Palette
+### Color Palette (Custom Theme)
 
-- **Background:** `#0a0c10` (gray-950)
-- **Surface:** `#14161d` (gray-900), `#1a1d26` (gray-850), `#21252e` (gray-800)
-- **Accent:** `#9333ea` (purple-600)
-- **Text:** `#ffffff` (white), `#9ca3af` (gray-400)
+The app uses CSS custom properties defined in `app/globals.css`:
+
+- **Surface Primary:** `#2b2c37` (dark gray background)
+- **Surface Secondary:** `#20212c` (darker gray)
+- **Surface Accent:** `#635fc7` (purple for interactive elements)
+- **Text Primary:** `#ffffff` (white text)
+- **Text Secondary:** `#828fa3` (muted gray)
 - **Status Colors:**
-  - TODO: Cyan (`#22d3ee`)
-  - DOING: Purple (`#a855f7`)
-  - DONE: Green (`#4ade80`)
+  - TODO: `#49c4e5` (cyan)
+  - DOING: `#635fc7` (purple)
+  - DONE: `#67e2ae` (green)
 
 ### Typography
 
-- Font: System UI stack
-- Weights: Regular (400), Medium (500), Semibold (600), Bold (700)
+- **Font Family**: Plus Jakarta Sans (Google Fonts)
+- **Font Weights**: 400 (Regular), 500 (Medium), 600 (Semibold), 700 (Bold)
+- **Loading**: `display: swap` for optimal font loading
 
 ## 🧪 Key Features Explained
 
@@ -288,9 +340,33 @@ The app uses React hooks for state management:
 
 All forms include:
 
-- Client-side validation (real-time feedback)
+- Client-side validation with real-time feedback
+- OnBlur validation for immediate user guidance
 - Server-side validation with Zod schemas
+- Character counters showing remaining space
+- Auto-focus on first input when modal opens
+- Loading spinners during submission
 - Comprehensive error messages
+
+### Testing
+
+The app includes comprehensive test coverage:
+
+- **9 Passing Tests** across 2 test suites
+- **API Route Tests**: Testing board CRUD operations
+- **Service Layer Tests**: Testing business logic
+- **Test Framework**: Jest with TypeScript support
+- **Mocking**: Prisma client mocked for isolated testing
+
+Run tests with:
+
+```bash
+npm run test          # Run all tests
+npm run test:watch    # Run in watch mode
+npm run test:coverage # Generate coverage report
+```
+
+See `__tests__/README.md` for detailed test documentation.
 
 ### Service Layer Pattern
 
@@ -359,27 +435,30 @@ If given more time, here are enhancements that could be added:
 
 ### High Priority
 
-- **Drag & Drop**: Implement drag-and-drop for tasks between columns
-- **Optimistic Updates**: Update UI before API response
-- **Loading States**: Better loading indicators
-- **Toast Notifications**: Success/error toast messages
+- **Drag & Drop**: Implement drag-and-drop for tasks between columns using dnd-kit
+- **Optimistic Updates**: Update UI before API response for snappier UX
+- **Custom Confirmation Modal**: Replace window.confirm with styled modal
+- **Toast Notifications**: Success/error toast messages instead of alerts
+- **Expand Test Coverage**: Add component tests with React Testing Library
 
 ### Medium Priority
 
-- **User Authentication**: Multi-user support with auth
-- **Task Search**: Search and filter tasks
-- **Due Dates**: Add deadlines to tasks
+- **User Authentication**: Multi-user support with NextAuth.js
+- **Task Search**: Search and filter tasks across boards
+- **Due Dates**: Add deadlines and reminders to tasks
 - **Task Assignees**: Assign tasks to team members
-- **Custom Columns**: Allow custom status columns
+- **Custom Columns**: Allow users to create custom status columns beyond TODO/DOING/DONE
+- **Task Comments**: Add discussion threads to tasks
 
 ### Nice to Have
 
-- **Dark/Light Mode Toggle**: User preference
-- **Keyboard Shortcuts**: Power user features
-- **Task Comments**: Discussion threads
-- **Activity Log**: Track changes
-- **Export/Import**: Data portability
-- **Real-time Collaboration**: WebSocket updates
+- **Dark/Light Mode Toggle**: User preference system
+- **Keyboard Shortcuts**: Power user features (e.g., 'c' to create task)
+- **Activity Log**: Track all changes and updates
+- **Export/Import**: Data portability (JSON/CSV)
+- **Real-time Collaboration**: WebSocket updates for multi-user editing
+- **Task Dependencies**: Link tasks together
+- **Subtasks**: Break large tasks into smaller ones
 
 ## 🐛 Troubleshooting
 

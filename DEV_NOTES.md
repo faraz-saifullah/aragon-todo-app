@@ -39,7 +39,13 @@ Default credentials (from `.env`):
    npm install
    ```
 
-2. **Start Docker PostgreSQL**
+2. **Set up environment variables**
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Start Docker PostgreSQL**
 
    ```bash
    npm run db:up
@@ -47,22 +53,21 @@ Default credentials (from `.env`):
 
    ✅ Verify: Run `docker ps` - you should see a postgres:14 container running
 
-3. **Generate Prisma Client**
+4. **Generate Prisma Client**
 
    ```bash
    npx prisma generate
    ```
 
-4. **Run migrations**
+5. **Run migrations**
 
    ```bash
    npm run migrate
    ```
 
-   - When prompted for migration name, enter: `init`
-   - This creates the Board and Task tables
+   - Creates the Board and Task tables with proper indexes
 
-5. **Seed the database**
+6. **Seed the database**
 
    ```bash
    npm run seed
@@ -71,13 +76,21 @@ Default credentials (from `.env`):
    - Creates 3 sample boards with 22 tasks
    - Based on the Platform Launch example from the design
 
-6. **Start development server**
+7. **Start development server**
 
    ```bash
    npm run dev
    ```
 
    - Opens on http://localhost:3000
+
+8. **Optional: Run tests**
+
+   ```bash
+   npm run test
+   ```
+
+   - Runs 9 tests to verify everything is working
 
 ## Common Issues & Solutions
 
@@ -294,26 +307,27 @@ npm run start
 
 ## Known Limitations
 
-1. **No Authentication**
-   - Would add NextAuth.js for production
-   - Currently single-user application
+1. **window.confirm for Delete**
+   - Currently uses browser confirm dialog
+   - Should implement custom styled modal (identified in code review)
 
-2. **No Real-time Updates**
+2. **Limited Test Coverage**
+   - 9 tests covering API routes and service layer
+   - Would add component tests with React Testing Library for production
+   - Would add E2E tests with Playwright
+
+3. **No Real-time Updates**
    - Updates are instant on same client
    - Multiple users need to refresh
    - Would use WebSockets for production
-
-3. **Basic Error Messages**
-   - Errors shown in console
-   - Would add toast notifications for production
 
 4. **No Drag & Drop**
    - Would use dnd-kit library
    - Requires additional complexity
 
-5. **No Tests**
-   - Would add Jest + React Testing Library
-   - API routes would use Supertest
+5. **No Optimistic UI Updates**
+   - UI waits for API response
+   - Could add for better perceived performance
 
 ## Production Checklist
 
