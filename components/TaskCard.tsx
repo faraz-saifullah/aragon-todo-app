@@ -17,10 +17,17 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
     }
   };
 
+  // Determine border color based on task status
+  const borderColorClass = {
+    TODO: 'border-l-status-todo',
+    DOING: 'border-l-status-doing',
+    DONE: 'border-l-status-done',
+  }[task.status];
+
   return (
     <div
       onClick={() => onEdit(task)}
-      className="group bg-surface-primary hover:bg-surface-hover rounded-lg px-3 py-4 md:px-4 md:py-[23px] cursor-pointer transition-colors shadow-[0_4px_6px_0_rgba(54,78,126,0.101545)]"
+      className={`group bg-surface-primary hover:bg-surface-hover rounded-lg px-3 py-4 md:px-4 md:py-[23px] cursor-pointer transition-colors shadow-[0_4px_6px_0_rgba(54,78,126,0.101545)] border-l-4 ${borderColorClass}`}
     >
       <h3 className="text-text-primary font-bold text-[14px] md:text-[15px] mb-1.5 md:mb-2 leading-[18px] md:leading-[19px]">
         {task.title}
