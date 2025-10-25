@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Validation schemas for API request bodies
- * 
+ *
  * Max length rationale:
  * - Board titles: 100 chars (fits in UI headers, DB varchar limit)
  * - Task titles: 200 chars (allows more descriptive tasks)
