@@ -159,7 +159,7 @@ export default function Home() {
         {/* Content Header - Board-specific actions */}
         <header
           role="banner"
-          className="bg-surface-primary border-b border-[#3E3F4E] px-6 py-5 md:px-8 md:py-6 flex items-center justify-between h-[80px] md:h-[96px] flex-shrink-0"
+          className="bg-surface-primary border-b border-border-primary px-6 py-5 md:px-8 md:py-6 flex items-center justify-between h-[80px] md:h-[96px] flex-shrink-0"
         >
           <h1 className="text-text-primary text-lg md:text-xl lg:text-2xl font-bold truncate">
             {board?.title || 'Select a board'}

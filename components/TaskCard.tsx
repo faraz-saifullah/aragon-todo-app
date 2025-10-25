@@ -24,7 +24,7 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   return (
     <div
       onClick={() => onEdit(task)}
-      className="group bg-surface-primary rounded-lg px-4 py-[23px] cursor-pointer hover:bg-surface-primary/80 transition-all shadow-[0_4px_6px_0_rgba(54,78,126,0.101545)] hover:shadow-lg"
+      className="group bg-surface-primary hover:bg-surface-hover rounded-lg px-4 py-[23px] cursor-pointer transition-colors shadow-[0_4px_6px_0_rgba(54,78,126,0.101545)]"
     >
       <h3 className="text-text-primary font-bold text-[15px] mb-2 leading-[19px]">{task.title}</h3>
 

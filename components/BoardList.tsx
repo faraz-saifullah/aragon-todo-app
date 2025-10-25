@@ -17,9 +17,9 @@ export default function BoardList({
   onAddBoard,
 }: BoardListProps) {
   return (
-    <aside className="w-[260px] h-full bg-surface-primary border-r border-[#3E3F4E] flex flex-col">
+    <aside className="w-[260px] h-full bg-surface-primary border-r border-border-primary flex flex-col">
       {/* Top section - aligned with header height */}
-      <div className="px-8 flex items-center h-[80px] md:h-[96px] border-b border-[#3E3F4E]">
+      <div className="px-8 flex items-center h-[80px] md:h-[96px] border-b border-border-primary">
         <div className="flex items-center gap-3">
           <div className="flex gap-1">
             <div className="w-[6px] h-[25px] bg-surface-accent rounded-sm" />

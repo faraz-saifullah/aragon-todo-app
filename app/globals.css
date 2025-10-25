@@ -1,15 +1,27 @@
 @import 'tailwindcss';
 
 @theme {
+  /* Surface colors */
   --color-surface-primary: #2b2c37;
   --color-surface-secondary: #20212c;
   --color-surface-accent: #635fc7;
+  --color-surface-hover: #2c2d3a;
+  
+    /* Text colors */
   --color-text-primary: #ffffff;
   --color-text-secondary: #828fa3;
   --color-text-muted: #5a5e6a;
+/* Status colors */
   --color-status-todo: #49c4e5;
   --color-status-doing: #635fc7;
   --color-status-done: #67e2ae;
+/* Border colors */
+  --color-border-primary: #3e3f4e;
+
+  /* Scrollbar colors */
+  --color-scrollbar-track: #2b2c37;
+  --color-scrollbar-thumb: #3a3a4a;
+  --color-scrollbar-thumb-hover: #4a4a5a;
 }
 
 :root {
@@ -45,16 +57,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #2b2c37;
+  background: var(--color-scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3a3a4a;
+  background: var(--color-scrollbar-thumb);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4a4a5a;
+  background: var(--color-scrollbar-thumb-hover);
 }
 
 /* Line clamp utilities */
