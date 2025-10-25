@@ -5,6 +5,7 @@
 Follow these steps to get the app running:
 
 ### 1. Prerequisites Check
+
 - [ ] Node.js 18+ installed (`node --version`)
 - [ ] Docker Desktop installed and running
 - [ ] Git installed
@@ -35,6 +36,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## 🎯 What You'll See
 
 The app will load with 3 pre-seeded boards:
+
 - **Platform Launch** (17 tasks across TODO, DOING, DONE)
 - **Marketing Plan** (3 tasks)
 - **Roadmap** (2 tasks)
@@ -51,6 +53,7 @@ The app will load with 3 pre-seeded boards:
 ## 🐛 Troubleshooting
 
 ### Docker not starting?
+
 ```bash
 # Check if Docker Desktop is running
 docker ps
@@ -59,6 +62,7 @@ docker ps
 ```
 
 ### Port 5432 in use?
+
 ```bash
 # Stop existing PostgreSQL
 npm run db:down
@@ -67,6 +71,7 @@ npm run db:down
 ```
 
 ### Database connection error?
+
 ```bash
 # Reset everything
 npm run db:down
@@ -94,6 +99,7 @@ npm run seed
 ## 📖 Full Documentation
 
 See [README.md](README.md) for complete documentation including:
+
 - Architecture details
 - API endpoints
 - Database schema
@@ -103,4 +109,3 @@ See [README.md](README.md) for complete documentation including:
 ---
 
 **Need help?** Check the Troubleshooting section in README.md
-

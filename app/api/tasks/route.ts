@@ -10,11 +10,11 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const boardId = searchParams.get('boardId');
-    
+
     if (!boardId) {
       return successResponse({ error: 'boardId query parameter is required' }, 400);
     }
-    
+
     const tasks = await getTasksByBoardId(boardId);
     return successResponse(tasks);
   } catch (error) {
@@ -35,4 +35,3 @@ export async function POST(request: NextRequest) {
     return handleApiError(error);
   }
 }
-

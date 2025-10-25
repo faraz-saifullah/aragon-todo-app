@@ -35,7 +35,7 @@ export function handleApiError(error: unknown): NextResponse<ApiError> {
   // Prisma errors
   if (error && typeof error === 'object' && 'code' in error) {
     const prismaError = error as { code: string; meta?: Record<string, unknown> };
-    
+
     switch (prismaError.code) {
       case 'P2002':
         return NextResponse.json(
@@ -43,10 +43,7 @@ export function handleApiError(error: unknown): NextResponse<ApiError> {
           { status: 409 }
         );
       case 'P2025':
-        return NextResponse.json(
-          { error: 'Record not found' },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: 'Record not found' }, { status: 404 });
       default:
         return NextResponse.json(
           { error: 'Database error', details: prismaError },
@@ -57,17 +54,11 @@ export function handleApiError(error: unknown): NextResponse<ApiError> {
 
   // Generic errors
   if (error instanceof Error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   // Unknown errors
-  return NextResponse.json(
-    { error: 'An unexpected error occurred' },
-    { status: 500 }
-  );
+  return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
 }
 
 /**
@@ -78,9 +69,5 @@ export function successResponse<T>(
   status = 200,
   message?: string
 ): NextResponse<ApiSuccess<T>> {
-  return NextResponse.json(
-    { data, ...(message && { message }) },
-    { status }
-  );
+  return NextResponse.json({ data, ...(message && { message }) }, { status });
 }
-

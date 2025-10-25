@@ -19,18 +19,21 @@ A modern, full-stack task management application built with Next.js, TypeScript,
 ## 📋 Tech Stack
 
 ### Frontend
+
 - **Next.js 16** - React framework with App Router
 - **TypeScript** - Type-safe development
 - **Tailwind CSS** - Utility-first CSS framework
 - **React Hooks** - State management (useState, useEffect, useCallback)
 
 ### Backend
+
 - **Next.js API Routes** - Serverless API endpoints
 - **Prisma** - Modern ORM for database operations
 - **Zod** - Schema validation library
 - **PostgreSQL** - Relational database
 
 ### Infrastructure
+
 - **Docker & Docker Compose** - Containerized PostgreSQL
 - **TypeScript** - Full type safety
 
@@ -191,23 +194,23 @@ enum TaskStatus {
 
 ### Boards
 
-| Method | Endpoint            | Description                    |
-|--------|---------------------|--------------------------------|
-| GET    | `/api/boards`       | Get all boards                 |
-| POST   | `/api/boards`       | Create a new board             |
-| GET    | `/api/boards/:id`   | Get a board with its tasks     |
-| PUT    | `/api/boards/:id`   | Update a board                 |
-| DELETE | `/api/boards/:id`   | Delete a board (and its tasks) |
+| Method | Endpoint          | Description                    |
+| ------ | ----------------- | ------------------------------ |
+| GET    | `/api/boards`     | Get all boards                 |
+| POST   | `/api/boards`     | Create a new board             |
+| GET    | `/api/boards/:id` | Get a board with its tasks     |
+| PUT    | `/api/boards/:id` | Update a board                 |
+| DELETE | `/api/boards/:id` | Delete a board (and its tasks) |
 
 ### Tasks
 
-| Method | Endpoint              | Description              |
-|--------|-----------------------|--------------------------|
-| GET    | `/api/tasks?boardId=` | Get all tasks for board  |
-| POST   | `/api/tasks`          | Create a new task        |
-| GET    | `/api/tasks/:id`      | Get a specific task      |
-| PUT    | `/api/tasks/:id`      | Update a task            |
-| DELETE | `/api/tasks/:id`      | Delete a task            |
+| Method | Endpoint              | Description             |
+| ------ | --------------------- | ----------------------- |
+| GET    | `/api/tasks?boardId=` | Get all tasks for board |
+| POST   | `/api/tasks`          | Create a new task       |
+| GET    | `/api/tasks/:id`      | Get a specific task     |
+| PUT    | `/api/tasks/:id`      | Update a task           |
+| DELETE | `/api/tasks/:id`      | Delete a task           |
 
 ### Request/Response Examples
 
@@ -224,6 +227,7 @@ Content-Type: application/json
 ```
 
 Response:
+
 ```json
 {
   "data": {
@@ -275,6 +279,7 @@ Content-Type: application/json
 ### State Management
 
 The app uses React hooks for state management:
+
 - `useBoards` - Manages boards list and CRUD operations
 - `useBoard` - Fetches a single board with tasks
 - `useTasks` - Manages tasks for a specific board
@@ -282,6 +287,7 @@ The app uses React hooks for state management:
 ### Form Validation
 
 All forms include:
+
 - Client-side validation (real-time feedback)
 - Server-side validation with Zod schemas
 - Comprehensive error messages
@@ -289,6 +295,7 @@ All forms include:
 ### Service Layer Pattern
 
 Business logic is separated into service files:
+
 - `board.service.ts` - Board operations
 - `task.service.ts` - Task operations
 
@@ -297,6 +304,7 @@ This keeps API routes clean and testable.
 ### Error Handling
 
 Consistent error handling across the application:
+
 - Zod validation errors (400)
 - Database errors (500)
 - Not found errors (404)
@@ -308,7 +316,7 @@ Consistent error handling across the application:
 
 1. **Frontend changes**: Modify components in `/components` or pages in `/app`
 2. **API changes**: Update route handlers in `/app/api`
-3. **Database changes**: 
+3. **Database changes**:
    - Modify `prisma/schema.prisma`
    - Run `npm run migrate`
    - Update service layer as needed
@@ -350,12 +358,14 @@ Consistent error handling across the application:
 If given more time, here are enhancements that could be added:
 
 ### High Priority
+
 - **Drag & Drop**: Implement drag-and-drop for tasks between columns
 - **Optimistic Updates**: Update UI before API response
 - **Loading States**: Better loading indicators
 - **Toast Notifications**: Success/error toast messages
 
 ### Medium Priority
+
 - **User Authentication**: Multi-user support with auth
 - **Task Search**: Search and filter tasks
 - **Due Dates**: Add deadlines to tasks
@@ -363,6 +373,7 @@ If given more time, here are enhancements that could be added:
 - **Custom Columns**: Allow custom status columns
 
 ### Nice to Have
+
 - **Dark/Light Mode Toggle**: User preference
 - **Keyboard Shortcuts**: Power user features
 - **Task Comments**: Discussion threads
@@ -375,12 +386,14 @@ If given more time, here are enhancements that could be added:
 ### Docker Issues
 
 **Problem**: Docker daemon not running
+
 ```bash
 # Start Docker Desktop, then retry:
 npm run db:up
 ```
 
 **Problem**: Port 5432 already in use
+
 ```bash
 # Stop other PostgreSQL instances or change port in docker-compose.yml
 ```
@@ -388,6 +401,7 @@ npm run db:up
 ### Database Issues
 
 **Problem**: Migration fails
+
 ```bash
 # Reset database
 npm run db:down
@@ -397,6 +411,7 @@ npm run seed
 ```
 
 **Problem**: Connection refused
+
 ```bash
 # Check if PostgreSQL is running
 docker ps
@@ -406,6 +421,7 @@ docker ps
 ### Build Issues
 
 **Problem**: Module not found
+
 ```bash
 # Clear node_modules and reinstall
 rm -rf node_modules

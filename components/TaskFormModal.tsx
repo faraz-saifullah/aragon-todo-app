@@ -91,11 +91,7 @@ export default function TaskFormModal({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={task ? 'Edit Task' : 'Create New Task'}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={task ? 'Edit Task' : 'Create New Task'}>
       <form onSubmit={handleSubmit}>
         <Input
           label="Task Title"
@@ -121,9 +117,7 @@ export default function TaskFormModal({
           options={STATUS_OPTIONS}
         />
 
-        {errors.submit && (
-          <p className="text-red-400 text-sm mb-4">{errors.submit}</p>
-        )}
+        {errors.submit && <p className="text-red-400 text-sm mb-4">{errors.submit}</p>}
 
         <div className="flex gap-3">
           <Button type="submit" variant="primary" disabled={loading}>
@@ -137,4 +131,3 @@ export default function TaskFormModal({
     </Modal>
   );
 }
-

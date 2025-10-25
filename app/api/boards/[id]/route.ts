@@ -16,11 +16,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
     const board = await getBoardById(id);
-    
+
     if (!board) {
       return successResponse({ error: 'Board not found' }, 404);
     }
-    
+
     return successResponse(board);
   } catch (error) {
     return handleApiError(error);
@@ -54,4 +54,3 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     return handleApiError(error);
   }
 }
-

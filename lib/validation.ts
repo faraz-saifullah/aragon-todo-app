@@ -8,7 +8,11 @@ export const createBoardSchema = z.object({
 });
 
 export const updateBoardSchema = z.object({
-  title: z.string().min(1, 'Board title is required').max(100, 'Board title is too long').optional(),
+  title: z
+    .string()
+    .min(1, 'Board title is required')
+    .max(100, 'Board title is too long')
+    .optional(),
   description: z.string().optional().nullable(),
   order: z.number().int().nonnegative().optional(),
 });
@@ -35,4 +39,3 @@ export type CreateBoardInput = z.infer<typeof createBoardSchema>;
 export type UpdateBoardInput = z.infer<typeof updateBoardSchema>;
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
-

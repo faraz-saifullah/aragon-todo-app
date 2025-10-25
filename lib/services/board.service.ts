@@ -65,4 +65,3 @@ export async function deleteBoard(id: string) {
     where: { id },
   });
 }
-

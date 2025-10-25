@@ -50,4 +50,3 @@ export interface UpdateBoardForm {
   title?: string;
   description?: string;
 }
-

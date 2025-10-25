@@ -33,17 +33,12 @@ export default function KanbanColumn({
           {title} ({count})
         </h2>
       </div>
-      
+
       <div className="flex flex-col gap-4 flex-1">
         {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            onEdit={onEditTask}
-            onDelete={onDeleteTask}
-          />
+          <TaskCard key={task.id} task={task} onEdit={onEditTask} onDelete={onDeleteTask} />
         ))}
-        
+
         <button
           onClick={() => onAddTask(status)}
           className="bg-gradient-to-b from-gray-800 to-gray-850 rounded-lg p-4 text-gray-400 hover:text-purple-400 transition-colors border border-dashed border-gray-700 hover:border-purple-500 text-sm font-medium"
@@ -54,4 +49,3 @@ export default function KanbanColumn({
     </div>
   );
 }
-

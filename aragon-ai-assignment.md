@@ -1,6 +1,6 @@
 # [Aragon.ai](http://Aragon.ai) Full Stack Project
 
-Hello! Thanks for participating in Aragon.ai’s technical interview today! 
+Hello! Thanks for participating in Aragon.ai’s technical interview today!
 
 Your challenge will be to build a basic task management app. There is a time limit with this challenge, so it’s essential to prioritize the most important features. For example it’s better to implement 7/10 requirements well, than it is to do 10/10 requirements poorly. It’s highly recommended that during the challenge you use AI tools such as chatgpt, claude, deepseek to help accelerate your progress.
 

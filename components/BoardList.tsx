@@ -27,12 +27,12 @@ export default function BoardList({
           </div>
           <h1 className="text-white text-2xl font-bold">kanban</h1>
         </div>
-        
+
         <p className="text-gray-400 text-xs uppercase tracking-wider font-semibold mb-4">
           All Boards ({boards.length})
         </p>
       </div>
-      
+
       <div className="flex-1 overflow-y-auto">
         <nav className="p-4 space-y-1">
           {boards.map((board) => (
@@ -45,26 +45,18 @@ export default function BoardList({
                   : 'text-gray-400 hover:bg-gray-800 hover:text-purple-400'
               }`}
             >
-              <svg
-                className="w-4 h-4"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z" />
               </svg>
               <span className="font-medium">{board.title}</span>
             </button>
           ))}
-          
+
           <button
             onClick={onAddBoard}
             className="w-full text-left px-4 py-3 rounded-r-full text-purple-400 hover:bg-gray-800 transition-colors flex items-center gap-3 font-medium"
           >
-            <svg
-              className="w-4 h-4"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z" />
             </svg>
             <span>+ Create New Board</span>
@@ -74,4 +66,3 @@ export default function BoardList({
     </aside>
   );
 }
-

@@ -12,12 +12,7 @@ interface BoardFormModalProps {
 /**
  * BoardFormModal - modal for creating/editing boards
  */
-export default function BoardFormModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  board,
-}: BoardFormModalProps) {
+export default function BoardFormModal({ isOpen, onClose, onSubmit, board }: BoardFormModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -70,11 +65,7 @@ export default function BoardFormModal({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={board ? 'Edit Board' : 'Create New Board'}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={board ? 'Edit Board' : 'Create New Board'}>
       <form onSubmit={handleSubmit}>
         <Input
           label="Board Title"
@@ -93,9 +84,7 @@ export default function BoardFormModal({
           rows={3}
         />
 
-        {errors.submit && (
-          <p className="text-red-400 text-sm mb-4">{errors.submit}</p>
-        )}
+        {errors.submit && <p className="text-red-400 text-sm mb-4">{errors.submit}</p>}
 
         <div className="flex gap-3">
           <Button type="submit" variant="primary" disabled={loading}>
@@ -109,4 +98,3 @@ export default function BoardFormModal({
     </Modal>
   );
 }
-

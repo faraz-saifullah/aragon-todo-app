@@ -15,23 +15,12 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
       <div className="relative bg-gray-800 rounded-lg w-full max-w-md mx-4 p-6 shadow-2xl border border-gray-700">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-white text-lg font-semibold">{title}</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -56,14 +45,7 @@ interface InputProps {
   required?: boolean;
 }
 
-export function Input({
-  label,
-  value,
-  onChange,
-  placeholder,
-  error,
-  required,
-}: InputProps) {
+export function Input({ label, value, onChange, placeholder, error, required }: InputProps) {
   return (
     <div className="mb-4">
       <label className="block text-gray-300 text-sm font-medium mb-2">
@@ -92,19 +74,10 @@ interface TextAreaProps {
   rows?: number;
 }
 
-export function TextArea({
-  label,
-  value,
-  onChange,
-  placeholder,
-  error,
-  rows = 4,
-}: TextAreaProps) {
+export function TextArea({ label, value, onChange, placeholder, error, rows = 4 }: TextAreaProps) {
   return (
     <div className="mb-4">
-      <label className="block text-gray-300 text-sm font-medium mb-2">
-        {label}
-      </label>
+      <label className="block text-gray-300 text-sm font-medium mb-2">{label}</label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -130,9 +103,7 @@ interface SelectProps {
 export function Select({ label, value, onChange, options, error }: SelectProps) {
   return (
     <div className="mb-4">
-      <label className="block text-gray-300 text-sm font-medium mb-2">
-        {label}
-      </label>
+      <label className="block text-gray-300 text-sm font-medium mb-2">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -184,4 +155,3 @@ export function Button({
     </button>
   );
 }
-

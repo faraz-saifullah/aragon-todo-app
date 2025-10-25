@@ -6,7 +6,14 @@ import KanbanColumn from '@/components/KanbanColumn';
 import BoardFormModal from '@/components/BoardFormModal';
 import TaskFormModal from '@/components/TaskFormModal';
 import { useBoards, useBoard } from '@/lib/hooks';
-import type { Task, TaskStatus, CreateBoardForm, UpdateBoardForm, CreateTaskForm, UpdateTaskForm } from '@/lib/types';
+import type {
+  Task,
+  TaskStatus,
+  CreateBoardForm,
+  UpdateBoardForm,
+  CreateTaskForm,
+  UpdateTaskForm,
+} from '@/lib/types';
 
 export default function Home() {
   const { boards, loading: boardsLoading, createBoard, updateBoard, deleteBoard } = useBoards();
@@ -149,9 +156,7 @@ export default function Home() {
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="bg-gray-900 border-b border-gray-800 px-8 py-6 flex items-center justify-between">
-          <h1 className="text-white text-2xl font-bold">
-            {board?.title || 'Select a board'}
-          </h1>
+          <h1 className="text-white text-2xl font-bold">{board?.title || 'Select a board'}</h1>
           <button
             onClick={handleAddBoard}
             className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"

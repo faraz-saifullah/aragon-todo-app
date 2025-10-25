@@ -3,22 +3,27 @@
 ## Important Setup Information
 
 ### Docker Note
+
 ⚠️ **Docker Desktop must be running before starting the database**
 
 If you see the error "Cannot connect to the Docker daemon", start Docker Desktop first:
+
 1. Open Docker Desktop application
 2. Wait for it to fully start (icon in menu bar should be stable)
 3. Then run: `npm run db:up`
 
 ### Database Connection
+
 The application connects to PostgreSQL running in a Docker container on `localhost:5432`.
 
 Connection string format:
+
 ```
 DATABASE_URL="postgresql://[user]:[password]@[host]:[port]/[database]?schema=public"
 ```
 
 Default credentials (from `.env`):
+
 - User: `dev`
 - Password: `devpassword`
 - Database: `aragon_dev`
@@ -29,32 +34,40 @@ Default credentials (from `.env`):
 **Critical**: Follow this exact order:
 
 1. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 2. **Start Docker PostgreSQL**
+
    ```bash
    npm run db:up
    ```
+
    ✅ Verify: Run `docker ps` - you should see a postgres:14 container running
 
 3. **Generate Prisma Client**
+
    ```bash
    npx prisma generate
    ```
 
 4. **Run migrations**
+
    ```bash
    npm run migrate
    ```
+
    - When prompted for migration name, enter: `init`
    - This creates the Board and Task tables
 
 5. **Seed the database**
+
    ```bash
    npm run seed
    ```
+
    - Creates 3 sample boards with 22 tasks
    - Based on the Platform Launch example from the design
 
@@ -62,45 +75,59 @@ Default credentials (from `.env`):
    ```bash
    npm run dev
    ```
+
    - Opens on http://localhost:3000
 
 ## Common Issues & Solutions
 
 ### Issue: "Cannot connect to Docker daemon"
+
 **Solution**: Start Docker Desktop application
 
 ### Issue: "Port 5432 already in use"
-**Solution**: 
+
+**Solution**:
+
 - Stop other PostgreSQL instances
 - Or change port in `docker-compose.yml`
 
 ### Issue: "Prisma Client not generated"
-**Solution**: 
+
+**Solution**:
+
 ```bash
 npx prisma generate
 ```
 
 ### Issue: "Table does not exist"
-**Solution**: 
+
+**Solution**:
+
 ```bash
 npm run migrate
 ```
 
 ### Issue: "No boards showing up"
-**Solution**: 
+
+**Solution**:
+
 ```bash
 npm run seed
 ```
 
 ### Issue: Module not found errors
-**Solution**: 
+
+**Solution**:
+
 ```bash
 rm -rf node_modules
 npm install
 ```
 
 ### Issue: Database connection refused
-**Solution**: 
+
+**Solution**:
+
 1. Check Docker is running: `docker ps`
 2. Restart container: `npm run db:down && npm run db:up`
 3. Wait 5-10 seconds for container to be ready
@@ -135,18 +162,21 @@ Opens Prisma Studio at http://localhost:5555 - a GUI for viewing/editing data.
 ## File Organization
 
 ### Backend
+
 - `/app/api/` - API route handlers
 - `/lib/services/` - Business logic
 - `/lib/validation.ts` - Zod schemas
 - `/lib/db.ts` - Prisma client
 
 ### Frontend
+
 - `/app/page.tsx` - Main application component
 - `/components/` - Reusable UI components
 - `/lib/hooks.ts` - Custom React hooks
 - `/lib/types.ts` - TypeScript types
 
 ### Config
+
 - `prisma/schema.prisma` - Database schema
 - `tailwind.config.ts` - Tailwind configuration
 - `tsconfig.json` - TypeScript configuration
@@ -206,22 +236,27 @@ npm run start
 ## Dependencies
 
 ### Core
+
 - next@16.0.0
 - react@19.2.0
 - typescript@5
 
 ### Database
+
 - @prisma/client@6.18.0
 - prisma@6.18.0
 
 ### Validation
+
 - zod@4.1.12
 
 ### Styling
+
 - tailwindcss@4
 - @tailwindcss/postcss@4
 
 ### Dev Tools
+
 - ts-node (for seed script)
 - eslint (linting)
 
@@ -298,6 +333,7 @@ If deploying to production:
 ## Support
 
 For issues:
+
 1. Check this document
 2. Check README.md troubleshooting section
 3. Check console for error messages
@@ -308,4 +344,3 @@ For issues:
 
 **Last Updated**: October 25, 2025  
 **Version**: 1.0.0
-

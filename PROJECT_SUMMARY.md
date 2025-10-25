@@ -7,6 +7,7 @@ A production-quality, full-stack Kanban task management application built for th
 ## 📊 Requirements Fulfilled
 
 ### Frontend ✅
+
 - [x] Create, read, update, and delete boards and tasks
 - [x] Frontend form validations when creating/editing
 - [x] State management using React hooks
@@ -16,6 +17,7 @@ A production-quality, full-stack Kanban task management application built for th
 - [x] High-fidelity dark UI design
 
 ### Backend ✅
+
 - [x] API using Next.js API routes (Node.js runtime)
 - [x] PostgreSQL database with Docker setup
 - [x] Good system design principles (service layer pattern)
@@ -28,12 +30,14 @@ A production-quality, full-stack Kanban task management application built for th
 ## 🏗️ Architecture Highlights
 
 ### Layered Architecture
+
 1. **Presentation Layer**: React components with TypeScript
 2. **API Layer**: Next.js API routes with validation
 3. **Service Layer**: Business logic (board.service, task.service)
 4. **Data Layer**: Prisma ORM with PostgreSQL
 
 ### Key Design Patterns
+
 - **Service Layer Pattern**: Separates business logic from API routes
 - **Repository Pattern**: Prisma acts as repository
 - **Error Handling Strategy**: Centralized error handling with typed responses
@@ -66,6 +70,7 @@ aragon-todo-app/
 ## 🔌 API Endpoints (10 total)
 
 ### Boards (5 endpoints)
+
 - `GET /api/boards` - List all boards
 - `POST /api/boards` - Create board
 - `GET /api/boards/:id` - Get board with tasks
@@ -73,6 +78,7 @@ aragon-todo-app/
 - `DELETE /api/boards/:id` - Delete board
 
 ### Tasks (5 endpoints)
+
 - `GET /api/tasks?boardId=` - List tasks for board
 - `POST /api/tasks` - Create task
 - `GET /api/tasks/:id` - Get specific task
@@ -89,21 +95,25 @@ aragon-todo-app/
 ## 🎯 Technical Decisions
 
 ### Why Next.js API Routes?
+
 - Same-origin requests (no CORS)
 - Easy deployment
 - TypeScript support out of the box
 
 ### Why Prisma?
+
 - Type-safe database access
 - Excellent migration system
 - Auto-generated TypeScript types
 
 ### Why Custom Hooks?
+
 - Cleaner component logic
 - Reusable data fetching
 - Better testing potential
 
 ### Why Service Layer?
+
 - Separates concerns
 - Easier to test
 - Can be reused across routes
@@ -111,11 +121,13 @@ aragon-todo-app/
 ## 🎨 Design System
 
 ### Colors
+
 - Background: Deep grays (#0a0c10 to #21252e)
 - Primary: Purple (#9333ea)
 - Status: Cyan (TODO), Purple (DOING), Green (DONE)
 
 ### Components
+
 - Cards with hover elevation
 - Modal overlays with backdrop blur
 - Rounded corners (8px)
@@ -146,6 +158,7 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
 ## ✨ Features Implemented
 
 ### Core Features
+
 - ✅ Full CRUD for boards and tasks
 - ✅ Three-column Kanban layout
 - ✅ Real-time UI updates
@@ -155,6 +168,7 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
 - ✅ Dark theme
 
 ### UX Enhancements
+
 - ✅ Hover effects on all interactive elements
 - ✅ Modal-based forms
 - ✅ Confirmation dialogs for destructive actions
@@ -163,6 +177,7 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
 - ✅ Auto-select first board
 
 ### Developer Experience
+
 - ✅ TypeScript throughout
 - ✅ Modular architecture
 - ✅ Consistent code style
@@ -173,6 +188,7 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
 ## 🔮 Future Enhancements
 
 If given more time, potential additions:
+
 - Drag & drop task reordering
 - User authentication
 - Real-time collaboration
@@ -193,6 +209,7 @@ If given more time, potential additions:
 ## 🎓 Lessons & Tradeoffs
 
 ### What Went Well
+
 - Clean architecture with separation of concerns
 - Comprehensive error handling
 - Type safety throughout
@@ -200,6 +217,7 @@ If given more time, potential additions:
 - Good developer experience
 
 ### Tradeoffs Made
+
 - Used client-side state instead of React Query (simpler for this scope)
 - No drag-and-drop (time constraint, would use dnd-kit)
 - Basic error messages (could use toast notifications)
@@ -236,6 +254,7 @@ If given more time, potential additions:
 ## 🎉 Result
 
 A fully functional, production-quality Kanban task management application with:
+
 - Clean, maintainable code
 - Modern architecture
 - Beautiful, responsive UI
@@ -250,4 +269,3 @@ A fully functional, production-quality Kanban task management application with:
 **Quality**: Production-ready  
 **Documentation**: Comprehensive  
 **Architecture**: Scalable & maintainable
-

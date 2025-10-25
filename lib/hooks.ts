@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Board, Task, CreateTaskForm, UpdateTaskForm, CreateBoardForm, UpdateBoardForm } from './types';
+import type {
+  Board,
+  Task,
+  CreateTaskForm,
+  UpdateTaskForm,
+  CreateBoardForm,
+  UpdateBoardForm,
+} from './types';
 
 /**
  * Custom hooks for API interactions
@@ -22,11 +29,11 @@ export function useBoards() {
       setError(null);
       const response = await fetch(`${API_BASE}/boards`);
       const result = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(result.error || 'Failed to fetch boards');
       }
-      
+
       setBoards(result.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -45,13 +52,13 @@ export function useBoards() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    
+
     const result = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(result.error || 'Failed to create board');
     }
-    
+
     await fetchBoards();
     return result.data;
   };
@@ -62,13 +69,13 @@ export function useBoards() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    
+
     const result = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(result.error || 'Failed to update board');
     }
-    
+
     await fetchBoards();
     return result.data;
   };
@@ -77,12 +84,12 @@ export function useBoards() {
     const response = await fetch(`${API_BASE}/boards/${id}`, {
       method: 'DELETE',
     });
-    
+
     if (!response.ok) {
       const result = await response.json();
       throw new Error(result.error || 'Failed to delete board');
     }
-    
+
     await fetchBoards();
   };
 
@@ -116,11 +123,11 @@ export function useBoard(boardId: string | null) {
       setError(null);
       const response = await fetch(`${API_BASE}/boards/${boardId}`);
       const result = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(result.error || 'Failed to fetch board');
       }
-      
+
       setBoard(result.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -160,11 +167,11 @@ export function useTasks(boardId: string | null) {
       setError(null);
       const response = await fetch(`${API_BASE}/tasks?boardId=${boardId}`);
       const result = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(result.error || 'Failed to fetch tasks');
       }
-      
+
       setTasks(result.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -183,13 +190,13 @@ export function useTasks(boardId: string | null) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    
+
     const result = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(result.error || 'Failed to create task');
     }
-    
+
     await fetchTasks();
     return result.data;
   };
@@ -200,13 +207,13 @@ export function useTasks(boardId: string | null) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    
+
     const result = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(result.error || 'Failed to update task');
     }
-    
+
     await fetchTasks();
     return result.data;
   };
@@ -215,12 +222,12 @@ export function useTasks(boardId: string | null) {
     const response = await fetch(`${API_BASE}/tasks/${id}`, {
       method: 'DELETE',
     });
-    
+
     if (!response.ok) {
       const result = await response.json();
       throw new Error(result.error || 'Failed to delete task');
     }
-    
+
     await fetchTasks();
   };
 
@@ -234,4 +241,3 @@ export function useTasks(boardId: string | null) {
     deleteTask,
   };
 }
-

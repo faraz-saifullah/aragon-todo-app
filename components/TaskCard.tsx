@@ -22,16 +22,12 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
       onClick={() => onEdit(task)}
       className="group bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-750 transition-all hover:shadow-lg border border-gray-700 hover:border-gray-600"
     >
-      <h3 className="text-white font-medium text-sm mb-2 line-clamp-2">
-        {task.title}
-      </h3>
-      
+      <h3 className="text-white font-medium text-sm mb-2 line-clamp-2">{task.title}</h3>
+
       {task.description && (
-        <p className="text-gray-400 text-xs mb-3 line-clamp-3">
-          {task.description}
-        </p>
+        <p className="text-gray-400 text-xs mb-3 line-clamp-3">{task.description}</p>
       )}
-      
+
       <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={handleDelete}
@@ -43,4 +39,3 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
     </div>
   );
 }
-
