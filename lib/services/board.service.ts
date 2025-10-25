@@ -1,5 +1,5 @@
-import { prisma } from './db';
-import type { CreateBoardInput, UpdateBoardInput } from './validation';
+import { prisma } from '../db';
+import type { CreateBoardInput, UpdateBoardInput } from '../validation';
 
 /**
  * Board service layer - handles all database operations for boards
