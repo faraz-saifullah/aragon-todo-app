@@ -1,65 +1,226 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useMemo } from 'react';
+import BoardList from '@/components/BoardList';
+import KanbanColumn from '@/components/KanbanColumn';
+import BoardFormModal from '@/components/BoardFormModal';
+import TaskFormModal from '@/components/TaskFormModal';
+import { useBoards, useBoard } from '@/lib/hooks';
+import type { Task, TaskStatus, CreateBoardForm, UpdateBoardForm, CreateTaskForm, UpdateTaskForm } from '@/lib/types';
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+  const { boards, loading: boardsLoading, createBoard, updateBoard, deleteBoard } = useBoards();
+  const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
+  const { board, refetch: refetchBoard } = useBoard(selectedBoardId);
+
+  // Modal states
+  const [boardModalOpen, setBoardModalOpen] = useState(false);
+  const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [editingBoard, setEditingBoard] = useState<typeof board | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus>('TODO');
+
+  // Auto-select first board if none selected
+  useState(() => {
+    if (!selectedBoardId && boards.length > 0) {
+      setSelectedBoardId(boards[0].id);
+    }
+  });
+
+  // Group tasks by status
+  const tasksByStatus = useMemo(() => {
+    const tasks = board?.tasks || [];
+    return {
+      TODO: tasks.filter((t) => t.status === 'TODO'),
+      DOING: tasks.filter((t) => t.status === 'DOING'),
+      DONE: tasks.filter((t) => t.status === 'DONE'),
+    };
+  }, [board]);
+
+  // Board handlers
+  const handleAddBoard = () => {
+    setEditingBoard(null);
+    setBoardModalOpen(true);
+  };
+
+  const handleBoardSubmit = async (data: CreateBoardForm | UpdateBoardForm) => {
+    if (editingBoard) {
+      await updateBoard(editingBoard.id, data);
+    } else {
+      const newBoard = await createBoard(data as CreateBoardForm);
+      setSelectedBoardId(newBoard.id);
+    }
+  };
+
+  // Task handlers
+  const handleAddTask = (status: TaskStatus) => {
+    setEditingTask(null);
+    setNewTaskStatus(status);
+    setTaskModalOpen(true);
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setTaskModalOpen(true);
+  };
+
+  const handleTaskSubmit = async (data: CreateTaskForm | UpdateTaskForm) => {
+    if (editingTask) {
+      // Update existing task
+      const response = await fetch(`/api/tasks/${editingTask.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || 'Failed to update task');
+      }
+    } else {
+      // Create new task
+      const response = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || 'Failed to create task');
+      }
+    }
+
+    await refetchBoard();
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    const response = await fetch(`/api/tasks/${taskId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const result = await response.json();
+      throw new Error(result.error || 'Failed to delete task');
+    }
+
+    await refetchBoard();
+  };
+
+  if (boardsLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-950">
+        <div className="text-white text-lg">Loading boards...</div>
+      </div>
+    );
+  }
+
+  if (boards.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-950">
+        <div className="text-center">
+          <h2 className="text-white text-2xl font-bold mb-4">No boards yet</h2>
+          <p className="text-gray-400 mb-6">Create your first board to get started!</p>
+          <button
+            onClick={handleAddBoard}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+          >
+            Create New Board
+          </button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <BoardFormModal
+          isOpen={boardModalOpen}
+          onClose={() => setBoardModalOpen(false)}
+          onSubmit={handleBoardSubmit}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-gray-950">
+      <BoardList
+        boards={boards}
+        selectedBoardId={selectedBoardId}
+        onSelectBoard={setSelectedBoardId}
+        onAddBoard={handleAddBoard}
+      />
+
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="bg-gray-900 border-b border-gray-800 px-8 py-6 flex items-center justify-between">
+          <h1 className="text-white text-2xl font-bold">
+            {board?.title || 'Select a board'}
+          </h1>
+          <button
+            onClick={handleAddBoard}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <span>+ Add New Task</span>
+          </button>
+        </header>
+
+        {/* Kanban Board */}
+        <div className="flex-1 overflow-x-auto overflow-y-hidden">
+          <div className="h-full p-8">
+            {board ? (
+              <div className="flex gap-6 h-full">
+                <KanbanColumn
+                  title="Todo"
+                  status="TODO"
+                  tasks={tasksByStatus.TODO}
+                  count={tasksByStatus.TODO.length}
+                  color="bg-cyan-400"
+                  onEditTask={handleEditTask}
+                  onDeleteTask={handleDeleteTask}
+                  onAddTask={handleAddTask}
+                />
+                <KanbanColumn
+                  title="Doing"
+                  status="DOING"
+                  tasks={tasksByStatus.DOING}
+                  count={tasksByStatus.DOING.length}
+                  color="bg-purple-500"
+                  onEditTask={handleEditTask}
+                  onDeleteTask={handleDeleteTask}
+                  onAddTask={handleAddTask}
+                />
+                <KanbanColumn
+                  title="Done"
+                  status="DONE"
+                  tasks={tasksByStatus.DONE}
+                  count={tasksByStatus.DONE.length}
+                  color="bg-green-400"
+                  onEditTask={handleEditTask}
+                  onDeleteTask={handleDeleteTask}
+                  onAddTask={handleAddTask}
+                />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-gray-400 text-lg">Select a board to view tasks</p>
+              </div>
+            )}
+          </div>
         </div>
       </main>
+
+      {/* Modals */}
+      <BoardFormModal
+        isOpen={boardModalOpen}
+        onClose={() => setBoardModalOpen(false)}
+        onSubmit={handleBoardSubmit}
+        board={editingBoard}
+      />
+
+      <TaskFormModal
+        isOpen={taskModalOpen}
+        onClose={() => setTaskModalOpen(false)}
+        onSubmit={handleTaskSubmit}
+        task={editingTask}
+        boardId={selectedBoardId || ''}
+        defaultStatus={newTaskStatus}
+      />
     </div>
   );
 }
