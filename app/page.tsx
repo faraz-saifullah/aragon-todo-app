@@ -21,7 +21,7 @@ import type {
 } from '@/lib/types';
 
 export default function Home() {
-  const { boards, loading: boardsLoading, createBoard, updateBoard } = useBoards();
+  const { boards, loading: boardsLoading, createBoard, updateBoard, deleteBoard } = useBoards();
   const toast = useToast();
 
   // Internal state for user's explicit selection (can be invalid)
@@ -54,7 +54,9 @@ export default function Home() {
 
   // Confirmation modal state
   const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [confirmationType, setConfirmationType] = useState<'task' | 'board'>('task');
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+  const [boardToDelete, setBoardToDelete] = useState<string | null>(null);
 
   // Mobile menu state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -89,6 +91,35 @@ export default function Home() {
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to save board');
+    }
+  };
+
+  const handleEditBoard = (board: typeof boards[0]) => {
+    setEditingBoard(board);
+    setBoardModalOpen(true);
+  };
+
+  const handleRequestDeleteBoard = (boardId: string) => {
+    setBoardToDelete(boardId);
+    setConfirmationType('board');
+    setConfirmationOpen(true);
+  };
+
+  const handleConfirmDeleteBoard = async () => {
+    if (!boardToDelete) return;
+
+    try {
+      await deleteBoard(boardToDelete);
+      toast.success('Board deleted successfully');
+
+      // If we deleted the selected board, clear selection
+      if (boardToDelete === selectedBoardId) {
+        setUserSelectedBoardId(null);
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete board');
+    } finally {
+      setBoardToDelete(null);
     }
   };
 
@@ -142,7 +173,16 @@ export default function Home() {
 
   const handleRequestDeleteTask = (taskId: string) => {
     setTaskToDelete(taskId);
+    setConfirmationType('task');
     setConfirmationOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (confirmationType === 'task') {
+      await handleConfirmDeleteTask();
+    } else {
+      await handleConfirmDeleteBoard();
+    }
   };
 
   const handleConfirmDeleteTask = async () => {
@@ -242,6 +282,8 @@ export default function Home() {
             handleAddBoard();
             setIsMobileMenuOpen(false); // Close menu after action on mobile
           }}
+          onEditBoard={handleEditBoard}
+          onDeleteBoard={handleRequestDeleteBoard}
           onClose={() => setIsMobileMenuOpen(false)} // Close button handler
         />
         {/* Mobile backdrop */}
@@ -345,10 +387,15 @@ export default function Home() {
         onClose={() => {
           setConfirmationOpen(false);
           setTaskToDelete(null);
+          setBoardToDelete(null);
         }}
-        onConfirm={handleConfirmDeleteTask}
-        title="Delete Task"
-        message="Are you sure you want to delete this task? This action cannot be undone."
+        onConfirm={handleConfirmDelete}
+        title={confirmationType === 'task' ? 'Delete Task' : 'Delete Board'}
+        message={
+          confirmationType === 'task'
+            ? 'Are you sure you want to delete this task? This action cannot be undone.'
+            : 'Are you sure you want to delete this board? All tasks and columns will be permanently deleted. This action cannot be undone.'
+        }
         confirmText="Delete"
         variant="danger"
       />

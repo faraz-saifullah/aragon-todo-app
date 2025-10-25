@@ -6,6 +6,8 @@ interface NavigationProps {
   selectedBoardId: string | null;
   onSelectBoard: (boardId: string) => void;
   onAddBoard: () => void;
+  onEditBoard: (board: Board) => void;
+  onDeleteBoard: (boardId: string) => void;
   onClose?: () => void; // Optional close handler for mobile
 }
 
@@ -18,6 +20,8 @@ export default function Navigation({
   selectedBoardId,
   onSelectBoard,
   onAddBoard,
+  onEditBoard,
+  onDeleteBoard,
   onClose,
 }: NavigationProps) {
   return (
@@ -31,6 +35,8 @@ export default function Navigation({
         selectedBoardId={selectedBoardId}
         onSelectBoard={onSelectBoard}
         onAddBoard={onAddBoard}
+        onEditBoard={onEditBoard}
+        onDeleteBoard={onDeleteBoard}
         onClose={onClose}
       />
     </nav>

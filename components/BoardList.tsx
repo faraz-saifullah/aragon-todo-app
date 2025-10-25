@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import type { Board } from '@/lib/types';
 
 interface BoardListProps {
@@ -5,6 +8,8 @@ interface BoardListProps {
   selectedBoardId: string | null;
   onSelectBoard: (boardId: string) => void;
   onAddBoard: () => void;
+  onEditBoard: (board: Board) => void;
+  onDeleteBoard: (boardId: string) => void;
   onClose?: () => void; // Optional close handler for mobile
 }
 
@@ -16,8 +21,29 @@ export default function BoardList({
   selectedBoardId,
   onSelectBoard,
   onAddBoard,
+  onEditBoard,
+  onDeleteBoard,
   onClose,
 }: BoardListProps) {
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+  const handleMenuToggle = (e: React.MouseEvent, boardId: string) => {
+    e.stopPropagation();
+    setOpenMenuId(openMenuId === boardId ? null : boardId);
+  };
+
+  const handleEdit = (e: React.MouseEvent, board: Board) => {
+    e.stopPropagation();
+    setOpenMenuId(null);
+    onEditBoard(board);
+  };
+
+  const handleDelete = (e: React.MouseEvent, boardId: string) => {
+    e.stopPropagation();
+    setOpenMenuId(null);
+    onDeleteBoard(boardId);
+  };
+
   return (
     <aside className="w-full lg:w-[260px] h-full bg-surface-primary border-r border-border-primary flex flex-col">
       {/* Top section - aligned with header height */}
@@ -63,22 +89,64 @@ export default function BoardList({
         {/* Section 2: Board Items */}
         <nav className="space-y-0">
           {boards.map((board) => (
-            <button
-              key={board.id}
-              onClick={() => onSelectBoard(board.id)}
-              className={`w-full text-left pl-6 lg:pl-8 pr-4 lg:pr-6 py-[12px] lg:py-[15px] mr-4 lg:mr-6 rounded-r-full transition-all flex items-center gap-3 group ${
-                selectedBoardId === board.id
-                  ? 'bg-surface-accent text-text-primary'
-                  : 'text-text-secondary hover:bg-text-primary/10 hover:text-surface-accent'
-              }`}
-            >
-              <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M0 2.5A.5.5 0 0 1 .5 2h3a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-11zm5 0A.5.5 0 0 1 5.5 2h3a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-7zm5 0A.5.5 0 0 1 10.5 2h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-3z" />
-              </svg>
-              <span className="font-bold text-[14px] lg:text-[15px] leading-tight break-words">
-                {board.title}
-              </span>
-            </button>
+            <div key={board.id} className="relative">
+              <button
+                onClick={() => onSelectBoard(board.id)}
+                className={`w-full text-left pl-6 lg:pl-8 pr-12 py-[12px] lg:py-[15px] mr-4 lg:mr-6 rounded-r-full transition-all flex items-center gap-3 group ${
+                  selectedBoardId === board.id
+                    ? 'bg-surface-accent text-text-primary'
+                    : 'text-text-secondary hover:bg-text-primary/10 hover:text-surface-accent'
+                }`}
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M0 2.5A.5.5 0 0 1 .5 2h3a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-11zm5 0A.5.5 0 0 1 5.5 2h3a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-7zm5 0A.5.5 0 0 1 10.5 2h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-3z" />
+                </svg>
+                <span className="font-bold text-[14px] lg:text-[15px] leading-tight break-words flex-1">
+                  {board.title}
+                </span>
+              </button>
+
+              {/* Kebab Menu Button */}
+              <button
+                onClick={(e) => handleMenuToggle(e, board.id)}
+                className={`absolute right-6 lg:right-8 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-text-primary/10 transition-opacity ${
+                  selectedBoardId === board.id
+                    ? 'text-text-primary opacity-100'
+                    : 'text-text-secondary opacity-0 group-hover:opacity-100'
+                }`}
+                aria-label="Board options"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+                </svg>
+              </button>
+
+              {/* Dropdown Menu */}
+              {openMenuId === board.id && (
+                <>
+                  {/* Backdrop */}
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setOpenMenuId(null)}
+                  />
+                  {/* Menu */}
+                  <div className="absolute right-6 lg:right-8 top-full mt-1 bg-surface-secondary rounded-lg shadow-lg py-2 min-w-[150px] z-20">
+                    <button
+                      onClick={(e) => handleEdit(e, board)}
+                      className="w-full text-left px-4 py-2 text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors text-sm"
+                    >
+                      Edit Board
+                    </button>
+                    <button
+                      onClick={(e) => handleDelete(e, board.id)}
+                      className="w-full text-left px-4 py-2 text-red-400 hover:bg-surface-hover hover:text-red-300 transition-colors text-sm"
+                    >
+                      Delete Board
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           ))}
 
           <button
