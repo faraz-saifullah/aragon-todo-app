@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Modal, { Input, TextArea, Select, Button } from './Modal';
-import type { Task, CreateTaskForm, UpdateTaskForm, StatusColumn } from '@/lib/types';
+import TaskHistoryTimeline from './TaskHistoryTimeline';
+import type { Task, CreateTaskForm, UpdateTaskForm, StatusColumn, User } from '@/lib/types';
 
 interface TaskFormModalProps {
   isOpen: boolean;
@@ -9,6 +10,8 @@ interface TaskFormModalProps {
   task?: Task | null;
   boardId: string;
   columns: StatusColumn[];
+  users: User[];
+  defaultCreatorId: string;
   defaultColumnId?: string;
 }
 
@@ -22,11 +25,14 @@ export default function TaskFormModal({
   task,
   boardId,
   columns,
+  users,
+  defaultCreatorId,
   defaultColumnId,
 }: TaskFormModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [statusId, setStatusId] = useState<string>(defaultColumnId || columns[0]?.id || '');
+  const [assigneeId, setAssigneeId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
@@ -36,15 +42,26 @@ export default function TaskFormModal({
     label: col.name,
   }));
 
+  // Build user options
+  const userOptions = [
+    { value: '', label: 'Unassigned' },
+    ...users.map((user) => ({
+      value: user.id,
+      label: user.name,
+    })),
+  ];
+
   useEffect(() => {
     if (task) {
       setTitle(task.title);
       setDescription(task.description || '');
       setStatusId(task.statusId);
+      setAssigneeId(task.assigneeId);
     } else {
       setTitle('');
       setDescription('');
       setStatusId(defaultColumnId || columns[0]?.id || '');
+      setAssigneeId(null);
     }
     setErrors({});
   }, [task, defaultColumnId, columns, isOpen]);
@@ -81,12 +98,15 @@ export default function TaskFormModal({
             title: title.trim(),
             description: description.trim() || undefined,
             statusId,
+          assigneeId: assigneeId || null,
           }
         : {
             title: title.trim(),
             description: description.trim() || undefined,
             statusId,
             boardId,
+          assigneeId: assigneeId || null,
+          creatorId: defaultCreatorId,
           };
       await onSubmit(data);
       onClose();
@@ -100,47 +120,76 @@ export default function TaskFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={task ? 'Edit Task' : 'Create New Task'}>
-      <form onSubmit={handleSubmit}>
-        <Input
-          label="Task Title"
-          value={title}
-          onChange={setTitle}
-          onBlur={handleTitleBlur}
-          placeholder="e.g., Build UI for onboarding flow"
-          error={errors.title}
-          required
-          maxLength={200}
-          autoFocus
-        />
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={task ? 'Edit Task' : 'Create New Task'}
+      wide={!!task} // Make modal wider when editing to accommodate 2-column layout
+    >
+      <div className={task ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : ''}>
+        {/* LEFT COLUMN - Task Details */}
+        <div className={task ? 'min-h-0' : ''}>
+          <form onSubmit={handleSubmit}>
+            {/* Metadata row - Assignee and Column side by side */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <Select
+                label="Assignee"
+                value={assigneeId || ''}
+                onChange={(value) => setAssigneeId(value || null)}
+                options={userOptions}
+              />
 
-        <TextArea
-          label="Description (Optional)"
-          value={description}
-          onChange={setDescription}
-          placeholder="Add more details about this task..."
-          rows={4}
-          maxLength={1000}
-        />
+              <Select
+                label="Column"
+                value={statusId}
+                onChange={(value) => setStatusId(value)}
+                options={columnOptions}
+              />
+            </div>
 
-        <Select
-          label="Column"
-          value={statusId}
-          onChange={(value) => setStatusId(value)}
-          options={columnOptions}
-        />
+            <Input
+              label="Task Title"
+              value={title}
+              onChange={setTitle}
+              onBlur={handleTitleBlur}
+              placeholder="e.g., Build UI for onboarding flow"
+              error={errors.title}
+              required
+              maxLength={200}
+              autoFocus
+            />
 
-        {errors.submit && <p className="text-red-400 text-sm mb-4">{errors.submit}</p>}
+            <TextArea
+              label="Description (Optional)"
+              value={description}
+              onChange={setDescription}
+              placeholder="Add more details about this task..."
+              rows={4}
+              maxLength={1000}
+            />
 
-        <div className="flex gap-3">
-          <Button type="submit" variant="primary" disabled={loading}>
-            {loading ? 'Saving...' : task ? 'Save Changes' : 'Create Task'}
-          </Button>
-          <Button type="button" variant="secondary" onClick={onClose}>
-            Cancel
-          </Button>
+            {errors.submit && <p className="text-red-400 text-sm mb-4">{errors.submit}</p>}
+
+            <div className="flex gap-3">
+              <Button type="submit" variant="primary" disabled={loading}>
+                {loading ? 'Saving...' : task ? 'Save Changes' : 'Create Task'}
+              </Button>
+              <Button type="button" variant="secondary" onClick={onClose}>
+                Cancel
+              </Button>
+            </div>
+          </form>
         </div>
-      </form>
+
+        {/* RIGHT COLUMN - History (only when editing) */}
+        {task && (
+          <div className="border-t lg:border-t-0 lg:border-l border-border-primary pt-6 lg:pt-0 lg:pl-6 mt-6 lg:mt-0 min-h-0">
+            <div className="h-full max-h-[50vh] lg:max-h-[60vh] overflow-y-auto pr-2">
+              <TaskHistoryTimeline taskId={task.id} />
+            </div>
+          </div>
+        )}
+      </div>
     </Modal>
   );
 }

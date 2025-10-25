@@ -125,10 +125,7 @@ export default function BoardList({
               {openMenuId === board.id && (
                 <>
                   {/* Backdrop */}
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setOpenMenuId(null)}
-                  />
+                  <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
                   {/* Menu */}
                   <div className="absolute right-6 lg:right-8 top-full mt-1 bg-surface-secondary rounded-lg shadow-lg py-2 min-w-[150px] z-20">
                     <button

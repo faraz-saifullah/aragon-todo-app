@@ -10,6 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  avatar        String? // Optional avatar URL or initials
+  assignedTasks Task[]   @relation("TaskAssignee")
+  createdTasks  Task[]   @relation("TaskCreator")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model Board {
   id          String         @id @default(uuid())
   title       String
@@ -36,20 +47,39 @@ model StatusColumn {
 }
 
 model Task {
-  id          String       @id @default(uuid())
+  id          String        @id @default(uuid())
   title       String
   description String?
   statusId    String
-  status      StatusColumn @relation(fields: [statusId], references: [id], onDelete: Cascade)
-  order       Int          @default(0)
+  status      StatusColumn  @relation(fields: [statusId], references: [id], onDelete: Cascade)
+  order       Int           @default(0)
   boardId     String
-  board       Board        @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  board       Board         @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  assigneeId  String?
+  assignee    User?         @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  creatorId   String
+  creator     User          @relation("TaskCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  history     TaskHistory[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   @@index([boardId])
   @@index([statusId, order])
   @@index([boardId, statusId, order])
+  @@index([assigneeId])
+  @@index([creatorId])
+}
+
+model TaskHistory {
+  id        String   @id @default(uuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  field     String // "status", "assignee", "title", "description"
+  oldValue  String?
+  newValue  String?
+  changedAt DateTime @default(now())
+
+  @@index([taskId, changedAt])
 }
 
 // Keep old enum for reference, but it's no longer used

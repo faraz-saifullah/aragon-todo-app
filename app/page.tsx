@@ -7,7 +7,7 @@ import BoardFormModal from '@/components/BoardFormModal';
 import TaskFormModal from '@/components/TaskFormModal';
 import ColumnFormModal from '@/components/ColumnFormModal';
 import ConfirmationModal from '@/components/ConfirmationModal';
-import { useBoards, useBoard } from '@/lib/hooks';
+import { useBoards, useBoard, useUsers } from '@/lib/hooks';
 import { useToast } from '@/contexts/ToastContext';
 import { getFromStorage, setInStorage } from '@/lib/hooks/usePersistedState';
 import type {
@@ -22,7 +22,11 @@ import type {
 
 export default function Home() {
   const { boards, loading: boardsLoading, createBoard, updateBoard, deleteBoard } = useBoards();
+  const { users, loading: usersLoading } = useUsers();
   const toast = useToast();
+
+  // Get default creator (first user for now, until we have auth)
+  const defaultCreator = users[0];
 
   // Internal state for user's explicit selection (can be invalid)
   const [userSelectedBoardId, setUserSelectedBoardId] = useState<string | null>(() => {
@@ -94,7 +98,7 @@ export default function Home() {
     }
   };
 
-  const handleEditBoard = (board: typeof boards[0]) => {
+  const handleEditBoard = (board: (typeof boards)[0]) => {
     setEditingBoard(board);
     setBoardModalOpen(true);
   };
@@ -232,10 +236,18 @@ export default function Home() {
     }
   };
 
-  if (boardsLoading) {
+  if (boardsLoading || usersLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-surface-secondary">
-        <div className="text-text-primary text-lg">Loading boards...</div>
+        <div className="text-text-primary text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!defaultCreator) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-surface-secondary">
+        <div className="text-text-primary text-lg">No users found. Please run the seed script.</div>
       </div>
     );
   }
@@ -372,6 +384,8 @@ export default function Home() {
         task={editingTask}
         boardId={selectedBoardId || ''}
         columns={columns}
+        users={users}
+        defaultCreatorId={defaultCreator.id}
         defaultColumnId={newTaskColumnId || undefined}
       />
 

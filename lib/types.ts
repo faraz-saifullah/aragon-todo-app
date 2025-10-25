@@ -4,6 +4,15 @@
 
 export type TaskStatus = 'TODO' | 'DOING' | 'DONE';
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface StatusColumn {
   id: string;
   boardId: string;
@@ -22,6 +31,10 @@ export interface Task {
   statusId: string;
   order: number;
   boardId: string;
+  assigneeId: string | null;
+  assignee?: User; // Populated when included
+  creatorId: string;
+  creator?: User; // Populated when included
   status?: StatusColumn; // The actual status column object when populated
   createdAt: string;
   updatedAt: string;
@@ -44,12 +57,15 @@ export interface CreateTaskForm {
   description?: string;
   statusId: string;
   boardId: string;
+  assigneeId?: string | null;
+  creatorId: string;
 }
 
 export interface UpdateTaskForm {
   title?: string;
   description?: string;
   statusId?: string;
+  assigneeId?: string | null;
 }
 
 export interface CreateBoardForm {

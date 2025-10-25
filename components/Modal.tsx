@@ -5,12 +5,13 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   title: string;
+  wide?: boolean; // Optional prop for wider modal
 }
 
 /**
  * Modal component - reusable modal wrapper
  */
-export default function Modal({ isOpen, onClose, children, title }: ModalProps) {
+export default function Modal({ isOpen, onClose, children, title, wide = false }: ModalProps) {
   // Lock body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -27,11 +28,16 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
 
   if (!isOpen) return null;
 
+  const maxWidthClass = wide ? 'max-w-4xl' : 'max-w-md';
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
-      <div className="relative bg-surface-primary rounded-lg w-full max-w-md mx-3 sm:mx-4 p-4 sm:p-6 shadow-2xl border border-surface-secondary">
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
+      <div
+        className={`relative bg-surface-primary rounded-lg w-full ${maxWidthClass} mx-3 sm:mx-4 shadow-2xl border border-surface-secondary`}
+        style={{ maxHeight: '90vh' }}
+      >
+        <div className="flex items-center justify-between mb-4 sm:mb-6 p-4 sm:p-6 pb-0">
           <h2 className="text-text-primary text-base sm:text-lg font-semibold">{title}</h2>
           <button
             onClick={onClose}
@@ -52,7 +58,9 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
             </svg>
           </button>
         </div>
-        {children}
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 80px)' }}>
+          {children}
+        </div>
       </div>
     </div>
   );

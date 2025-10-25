@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type {
   Board,
   Task,
+  User,
   CreateTaskForm,
   UpdateTaskForm,
   CreateBoardForm,
@@ -14,6 +15,40 @@ import type {
 
 // Base API URL
 const API_BASE = '/api';
+
+/**
+ * Hook to fetch users
+ */
+export function useUsers() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`${API_BASE}/users`);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to fetch users');
+      }
+
+      setUsers(result.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  return { users, loading, error, refetch: fetchUsers };
+}
 
 /**
  * Hook to manage boards data

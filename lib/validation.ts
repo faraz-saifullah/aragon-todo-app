@@ -50,6 +50,8 @@ export const createTaskSchema = z.object({
   statusId: z.string().uuid('Invalid status column ID'),
   order: z.number().int().nonnegative().optional(),
   boardId: z.string().uuid('Invalid board ID'),
+  assigneeId: z.string().uuid('Invalid assignee ID').nullable().optional(),
+  creatorId: z.string().uuid('Invalid creator ID'),
 });
 
 export const updateTaskSchema = z.object({
@@ -67,6 +69,7 @@ export const updateTaskSchema = z.object({
   statusId: z.string().uuid('Invalid status column ID').optional(),
   order: z.number().int().nonnegative().optional(),
   boardId: z.string().uuid('Invalid board ID').optional(),
+  assigneeId: z.string().uuid('Invalid assignee ID').nullable().optional(),
 });
 
 // StatusColumn validation schemas

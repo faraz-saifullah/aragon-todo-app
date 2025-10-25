@@ -25,6 +25,10 @@ export async function getBoardById(id: string) {
         include: {
           tasks: {
             orderBy: { order: 'asc' },
+            include: {
+              assignee: true,
+              creator: true,
+            },
           },
         },
       },

@@ -10,7 +10,9 @@ export async function getTasksByBoardId(boardId: string) {
     where: { boardId },
     orderBy: [{ order: 'asc' }],
     include: {
-      status: true, // Include the status column info
+      status: true,
+      assignee: true,
+      creator: true,
     },
   });
 }
@@ -21,6 +23,8 @@ export async function getTaskById(id: string) {
     include: {
       board: true,
       status: true,
+      assignee: true,
+      creator: true,
     },
   });
 }
@@ -46,26 +50,124 @@ export async function createTask(data: CreateTaskInput) {
       description: data.description,
       statusId: data.statusId,
       boardId: data.boardId,
+      assigneeId: data.assigneeId,
+      creatorId: data.creatorId,
       order: orderValue,
     },
     include: {
       status: true,
+      assignee: true,
+      creator: true,
     },
   });
 }
 
 export async function updateTask(id: string, data: UpdateTaskInput) {
-  return prisma.task.update({
+  // Get current task to compare changes
+  const currentTask = await prisma.task.findUnique({
     where: { id },
-    data,
     include: {
       status: true,
+      assignee: true,
     },
   });
+
+  if (!currentTask) {
+    throw new Error('Task not found');
+  }
+
+  // Track changes for history
+  const historyEntries: Array<{
+    taskId: string;
+    field: string;
+    oldValue: string | null;
+    newValue: string | null;
+  }> = [];
+
+  // Track status change
+  if (data.statusId && data.statusId !== currentTask.statusId) {
+    const newStatus = await prisma.statusColumn.findUnique({
+      where: { id: data.statusId },
+    });
+
+    if (newStatus) {
+      historyEntries.push({
+        taskId: id,
+        field: 'status',
+        oldValue: currentTask.status.name,
+        newValue: newStatus.name,
+      });
+    }
+  }
+
+  // Track assignee change (if assignee field is provided)
+  if (data.assigneeId !== undefined && data.assigneeId !== currentTask.assigneeId) {
+    let newAssigneeName: string | null = null;
+
+    if (data.assigneeId) {
+      const newAssignee = await prisma.user.findUnique({
+        where: { id: data.assigneeId },
+      });
+      newAssigneeName = newAssignee?.name || null;
+    }
+
+    historyEntries.push({
+      taskId: id,
+      field: 'assignee',
+      oldValue: currentTask.assignee?.name || null,
+      newValue: newAssigneeName,
+    });
+  }
+
+  // Track title change
+  if (data.title && data.title !== currentTask.title) {
+    historyEntries.push({
+      taskId: id,
+      field: 'title',
+      oldValue: currentTask.title,
+      newValue: data.title,
+    });
+  }
+
+  // Track description change
+  if (data.description !== undefined && data.description !== currentTask.description) {
+    historyEntries.push({
+      taskId: id,
+      field: 'description',
+      oldValue: currentTask.description || null,
+      newValue: data.description || null,
+    });
+  }
+
+  // Update task and create history entries in a transaction
+  const [updatedTask] = await prisma.$transaction([
+    prisma.task.update({
+      where: { id },
+      data,
+      include: {
+        status: true,
+        assignee: true,
+      },
+    }),
+    ...historyEntries.map((entry) =>
+      prisma.taskHistory.create({
+        data: entry,
+      })
+    ),
+  ]);
+
+  return updatedTask;
 }
 
 export async function deleteTask(id: string) {
   return prisma.task.delete({
     where: { id },
+  });
+}
+
+export async function getTaskHistory(taskId: string) {
+  return prisma.taskHistory.findMany({
+    where: { taskId },
+    orderBy: { changedAt: 'desc' },
   });
 }

@@ -25,10 +25,24 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
         {task.title}
       </h3>
 
-      <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 md:mt-2">
+      {/* Footer with assignee avatar and delete button */}
+      <div className="flex items-center justify-between mt-3 pt-2">
+        {/* Assignee Avatar */}
+        {task.assignee ? (
+          <div
+            className="w-7 h-7 rounded-full bg-surface-accent flex items-center justify-center text-text-primary text-[11px] font-bold"
+            title={task.assignee.name}
+          >
+            {task.assignee.avatar || task.assignee.name.substring(0, 2).toUpperCase()}
+          </div>
+        ) : (
+          <div className="w-7 h-7"></div>
+        )}
+
+        {/* Delete button - shown on hover */}
         <button
           onClick={handleDelete}
-          className="text-red-400 hover:text-red-300 text-[11px] md:text-xs font-medium"
+          className="text-red-400 hover:text-red-300 text-[11px] md:text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity"
         >
           Delete
         </button>

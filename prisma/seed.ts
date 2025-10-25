@@ -7,6 +7,43 @@ async function main() {
   await prisma.task.deleteMany();
   await prisma.statusColumn.deleteMany();
   await prisma.board.deleteMany();
+  await prisma.user.deleteMany();
+
+  // Create dummy users
+  const users = await prisma.user.createManyAndReturn({
+    data: [
+      {
+        name: 'Sarah Chen',
+        email: 'sarah@example.com',
+        avatar: 'SC',
+      },
+      {
+        name: 'Mike Johnson',
+        email: 'mike@example.com',
+        avatar: 'MJ',
+      },
+      {
+        name: 'Emily Rodriguez',
+        email: 'emily@example.com',
+        avatar: 'ER',
+      },
+      {
+        name: 'Alex Kumar',
+        email: 'alex@example.com',
+        avatar: 'AK',
+      },
+      {
+        name: 'Jessica Park',
+        email: 'jessica@example.com',
+        avatar: 'JP',
+      },
+    ],
+  });
+
+  console.log(`Created ${users.length} users`);
+
+  // Helper to get random user
+  const getRandomUser = () => users[Math.floor(Math.random() * users.length)];
 
   // Create "Platform Launch" board with columns
   const platformLaunch = await prisma.board.create({
@@ -38,6 +75,8 @@ async function main() {
         description: 'Create user-friendly onboarding screens',
         statusId: todoCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[0].id, // Sarah
+        creatorId: users[0].id,
         order: 0,
       },
       {
@@ -45,6 +84,8 @@ async function main() {
         description: 'Implement search functionality',
         statusId: todoCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[0].id, // Sarah
+        creatorId: users[1].id,
         order: 1,
       },
       {
@@ -52,6 +93,8 @@ async function main() {
         description: 'Create settings page',
         statusId: todoCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[1].id, // Mike
+        creatorId: users[0].id,
         order: 2,
       },
       {
@@ -59,6 +102,8 @@ async function main() {
         description: 'Complete end-to-end testing',
         statusId: todoCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[2].id, // Emily
+        creatorId: users[0].id,
         order: 3,
       },
       // DOING tasks
@@ -67,6 +112,8 @@ async function main() {
         description: 'Complete design for settings and search',
         statusId: doingCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[3].id, // Alex
+        creatorId: users[0].id,
         order: 0,
       },
       {
@@ -74,6 +121,8 @@ async function main() {
         description: 'Implement account CRUD operations',
         statusId: doingCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[1].id, // Mike
+        creatorId: users[1].id,
         order: 1,
       },
       {
@@ -81,6 +130,8 @@ async function main() {
         description: 'Create onboarding wireframes and mockups',
         statusId: doingCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[3].id, // Alex
+        creatorId: users[3].id,
         order: 2,
       },
       {
@@ -88,6 +139,8 @@ async function main() {
         description: 'Implement search API',
         statusId: doingCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[1].id, // Mike
+        creatorId: users[1].id,
         order: 3,
       },
       {
@@ -95,6 +148,8 @@ async function main() {
         description: 'Implement auth API',
         statusId: doingCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[4].id, // Jessica
+        creatorId: users[4].id,
         order: 4,
       },
       {
@@ -102,6 +157,8 @@ async function main() {
         description: 'Market research for pricing strategy',
         statusId: doingCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[4].id, // Jessica
+        creatorId: users[4].id,
         order: 5,
       },
       // DONE tasks
@@ -110,6 +167,8 @@ async function main() {
         description: 'User testing of wireframes',
         statusId: doneCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[2].id, // Emily
+        creatorId: users[2].id,
         order: 0,
       },
       {
@@ -117,6 +176,8 @@ async function main() {
         description: 'High-fidelity prototype',
         statusId: doneCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[3].id, // Alex
+        creatorId: users[3].id,
         order: 1,
       },
       {
@@ -124,6 +185,8 @@ async function main() {
         description: 'Incorporate user feedback',
         statusId: doneCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[2].id, // Emily
+        creatorId: users[2].id,
         order: 2,
       },
       {
@@ -131,6 +194,8 @@ async function main() {
         description: 'Early stage user testing',
         statusId: doneCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[2].id, // Emily
+        creatorId: users[0].id,
         order: 3,
       },
       {
@@ -138,6 +203,8 @@ async function main() {
         description: 'Research target market',
         statusId: doneCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[4].id, // Jessica
+        creatorId: users[4].id,
         order: 4,
       },
       {
@@ -145,6 +212,8 @@ async function main() {
         description: 'Analyze competitor landscape',
         statusId: doneCol.id,
         boardId: platformLaunch.id,
+        assigneeId: users[4].id, // Jessica
+        creatorId: users[4].id,
         order: 5,
       },
       {
@@ -152,7 +221,9 @@ async function main() {
         description: 'Deep market research',
         statusId: doneCol.id,
         boardId: platformLaunch.id,
+        creatorId: users[0].id,
         order: 6,
+        // No assignee for this one
       },
     ],
   });
@@ -183,6 +254,7 @@ async function main() {
         description: 'Prepare for Product Hunt launch',
         statusId: mktTodoCol.id,
         boardId: marketingPlan.id,
+        creatorId: users[0].id,
         order: 0,
       },
       {
@@ -190,6 +262,7 @@ async function main() {
         description: 'Post on Hacker News',
         statusId: mktTodoCol.id,
         boardId: marketingPlan.id,
+        creatorId: users[0].id,
         order: 1,
       },
       {
@@ -197,6 +270,7 @@ async function main() {
         description: 'Create launch announcement',
         statusId: mktDoingCol.id,
         boardId: marketingPlan.id,
+        creatorId: users[0].id,
         order: 0,
       },
     ],
@@ -227,6 +301,7 @@ async function main() {
         description: 'MVP release',
         statusId: roadmapTodoCol.id,
         boardId: roadmap.id,
+        creatorId: users[0].id,
         order: 0,
       },
       {
@@ -234,6 +309,7 @@ async function main() {
         description: 'Gather and analyze user feedback',
         statusId: roadmapTodoCol.id,
         boardId: roadmap.id,
+        creatorId: users[0].id,
         order: 1,
       },
     ],
