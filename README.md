@@ -545,34 +545,33 @@ Consistent error handling across the application:
 - **Pros**: Simple, no external dependencies, works well for this scale
 - **Cons**: Wouldn't scale to very large applications (would use React Query/SWR)
 
-## 🔮 Possible Improvements
+## 🔮 Future Enhancements
 
-If given more time, here are enhancements that could be added:
+If given more time, here are additional features that could be added:
 
 ### High Priority
 
-- **Drag & Drop**: Implement drag-and-drop for tasks between columns using dnd-kit
 - **Optimistic Updates**: Update UI before API response for snappier UX
-- **Expand Test Coverage**: Add component tests with React Testing Library
+- **Expand Test Coverage**: Add component tests with React Testing Library and E2E tests with Playwright
 
 ### Medium Priority
 
-- **User Authentication**: Multi-user support with NextAuth.js
-- **Task Search**: Search and filter tasks across boards
+- **User Authentication**: Multi-user login with NextAuth.js (user system is ready, just needs auth)
+- **Task Search**: Global search and filter tasks across boards
 - **Due Dates**: Add deadlines and reminders to tasks
 - **Task Comments**: Add discussion threads to tasks
-- **Column Reordering**: Drag-and-drop to reorder columns
-- **Pagination**: Add pagination for large task lists
+- **Column Reordering**: Drag-and-drop to reorder columns (API ready, just needs frontend)
+- **Pagination**: Add pagination for boards with 100+ tasks
 
 ### Nice to Have
 
-- **Dark/Light Mode Toggle**: User preference system
-- **Keyboard Shortcuts**: Power user features (e.g., 'c' to create task)
-- **Activity Log**: Track all changes and updates
-- **Export/Import**: Data portability (JSON/CSV)
+- **Dark/Light Mode Toggle**: User preference system (currently dark theme only)
+- **Keyboard Shortcuts**: Power user features (e.g., 'c' to create task, 'esc' to close modal)
+- **Export/Import**: Data portability (JSON/CSV export for boards)
 - **Real-time Collaboration**: WebSocket updates for multi-user editing
-- **Task Dependencies**: Link tasks together
-- **Subtasks**: Break large tasks into smaller ones
+- **Task Dependencies**: Link tasks together with "blocked by" relationships
+- **Subtasks**: Break large tasks into smaller ones with progress tracking
+- **Email Notifications**: Notify users when assigned or mentioned
 
 ## 🐛 Troubleshooting
 
